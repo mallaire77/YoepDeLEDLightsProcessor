@@ -1,12 +1,4 @@
-import { paths } from './paths.js'
-
-const hpdArx01Path = [
-    ...paths.rightSideFocusedPath,
-    'LedContainers', { field: 'Description', value: 'Prototype' },
-    'LedContainers', { field: 'CarModel', value: 'HPD ARX-01c' }
-]
-
-const hpdArx01Fn = (numberOfSegments) => (car) => {
+const hpdArx01 = (numberOfSegments) => (car) => {
     return {
         ...car,
         LedContainers: car.LedContainers.map(gearContainer => ({
@@ -32,8 +24,5 @@ const hpdArx01Fn = (numberOfSegments) => (car) => {
 }
 
 export const cars = {
-    hpdArx01: {
-        path: hpdArx01Path,
-        fn: hpdArx01Fn
-    }
+    hpdArx01
 }

@@ -7,6 +7,10 @@ const gt3Path = [...middleFocusedPath, { field: 'Description', value: 'GT3' }]
 const gt4Path = [...middleFocusedPath, { field: 'Description', value: 'GT4' }]
 const prototypePath = [...middleFocusedPath, { field: 'Description', value: 'Prototype' }]
 const openWheelPath = [...middleFocusedPath, { field: 'Description', value: 'Open Wheel' }]
+const feederSeriesPath = [...openWheelPath, { field: 'Description', value: 'Feeder Series' }]
+const superFormulaPath = [...openWheelPath, { field: 'Description', value: 'Super Formula' }]
+const openWheelVariousPath = [...openWheelPath, { field: 'Description', value: 'Various' }]
+const hpdArx01Path = [...rightSideFocusedPath, { field: 'Description', value: 'Prototype' }, { field: 'CarModel', value: 'HPD ARX-01c' }]
 
 export const paths = {
     leftModulePath,
@@ -17,5 +21,9 @@ export const paths = {
     gt3Path,
     gt4Path,
     prototypePath,
-    openWheelPath
+    openWheelPath,
+    feederSeriesPath,
+    superFormulaPath,
+    openWheelVariousPath,
+    hpdArx01Path
 }
