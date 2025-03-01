@@ -1,81 +1,56 @@
 import fs from 'fs'
 import { cars } from './cars.js'
 import { createMutator, createReader } from './functions.js'
-import { paths } from './paths.js'
-
-// Arguments
-const args = process.argv.slice(2)
-const options = {}
-const requiredOptions = ['file', 'left', 'middle', 'right']
-for (let i = 0; i < args.length; i++) {
-    if (args[i].startsWith('--')) {
-        switch (args[i]) {
-            case '--file':
-                options.file = args[i + 1]
-                i++
-                break
-
-            case '--left':
-                options.left = parseInt(args[i + 1], 10)
-                i++
-                break
-
-            case '--middle':
-                options.middle = parseInt(args[i + 1], 10)
-                i++
-                break
-
-            case '--right':
-                options.right = parseInt(args[i + 1], 10)
-                i++
-                break
-
-            case '--debug':
-                options.debug = args[i + 1]
-                i++
-                break
-
-            default:
-                console.error(`Unknown option: ${args[i]}`)
-                process.exit(1)
-        }
-    } else {
-        console.error(`Unknown argument: ${args[i]}`)
-        process.exit(1)
-    }
-}
-
-if (requiredOptions.some(option => options[option] === undefined)) {
-    console.error('Missing required options!')
-    console.error('Usage: node src/main.js --file <file> --left <left> --middle <middle> --right <right>')
-    process.exit(1)
-}
-
-if (options.left > 3 || options.middle > 15 || options.middle < 3 || options.right > 3) {
-    console.error('Invalid number of segments!')
-    console.error('Usage: node src/main.js --file <file> --left <left> --middle <middle> --right <right>')
-    process.exit(1)
-}
+import { deprecatedPaths, paths } from './paths.js'
+import { getArguments } from './arguments.js'
 
 // Scaffold
+const options = getArguments()
 const profile = JSON.parse(fs.readFileSync(options.file, 'utf8'))
 const leftStartPosition = 1
 const middleStartPosition = options.left + 1
 const rightStartPosition = options.left + options.middle + 1
-const numberOfSegments = options.middle
+const total = options.left + options.middle + options.right
 
-// Validation
+// Validate original profile
 const reader = createReader(profile)
-for (const path in paths) {
-    if (reader.get(paths[path]) === undefined) {
-        console.error(`Path ${path} not found in profile!`)
+for (const path in deprecatedPaths) {
+    if (path !== 'movedMiddleFocusedPath' && reader.get(deprecatedPaths[path]) === undefined) {
+        console.error(`Deprecated path ${path} not found in profile!`)
         process.exit(1)
     }
 }
 
-// Execution
-const updatedProfile =
+// Pre-process original profile (modify structure)
+const preProcessedProfile =
     createMutator(profile)
+        .move(deprecatedPaths.hpdArx01Path, deprecatedPaths.middleFocusedPrototypePath)
+        .delete(deprecatedPaths.rightSideFocusedPath)
+        .move(deprecatedPaths.middleFocusedPath, deprecatedPaths.rpmPath)
+        .mutate(deprecatedPaths.movedMiddleFocusedPath, container => ({
+            ...container,
+            Description: 'Cars'
+        }))
+        .mutate([], container => ({
+            ...container,
+            Name: `${container.Name.substring(0, container.Name.indexOf("LEDLights") === -1 ? container.Name.length : container.Name.indexOf("LEDLights") + "LEDLights".length)} ${options.left}-${options.middle}-${options.right}`
+        }))
+        .delete(deprecatedPaths.wipPath)
+        .delete(deprecatedPaths.testLedsGameDataPath)
+        .result()
+
+// Validate pre-processed profile
+const preProcessedReader = createReader(preProcessedProfile)
+for (const path in paths) {
+    if (preProcessedReader.get(paths[path]) === undefined) {
+        console.error(`Path ${path} not found in pre-processed profile!`)
+        process.exit(1)
+    }
+}
+
+// Update pre-processed profile cars according to arguments
+const updatedProfile =
+    createMutator(preProcessedProfile)
         .mutate(paths.leftModulePath, container => ({
             ...container,
             IsEnabled: options.left > 0,
@@ -86,22 +61,39 @@ const updatedProfile =
             IsEnabled: options.right > 0,
             StartPosition: rightStartPosition
         }))
-        .mutate(paths.rightSideFocusedPath, container => ({
+        .mutate(paths.carsPath, container => ({
             ...container,
             StartPosition: middleStartPosition
         }))
-        .mutate(paths.middleFocusedPath, container => ({
+        .mutate(paths.carsNotRunningPath, container => ({
             ...container,
-            StartPosition: middleStartPosition
+            StartPosition: leftStartPosition,
+            LedContainers: container.LedContainers.map(ledContainer => ({
+                ...ledContainer,
+                LedCount: total
+            }))
         }))
-        .mutate(paths.hpdArx01Path, cars.hpdArx01(numberOfSegments))
+        .mutate(paths.gameNotRunningPath, container => ({
+            ...container,
+            StartPosition: leftStartPosition,
+            LedContainers: container.LedContainers.map(ledContainer => ({
+                ...ledContainer,
+                LedCount: total
+            }))
+        }))
         .result()
 
-// Output
-if (!options.debug) {
-    const outputFile = `${options.left}-${options.middle}-${options.right}.ledsprofile`
+// Debug or save profile
+if (options.debug) {
+    console.log(createReader(updatedProfile).get(paths[options.debug]))
+    process.exit(0)
+} else {
+    if (!fs.existsSync('./outputs')) {
+        fs.mkdirSync('./outputs', { recursive: true })
+    }
+
+    const outputFile = `./outputs/${options.left}-${options.middle}-${options.right}.ledsprofile`
     fs.writeFileSync(outputFile, JSON.stringify(updatedProfile, null, 2), 'utf8')
     console.log(`Profile saved to ${outputFile}!`)
-} else {
-    console.log(createReader(updatedProfile).get(paths[options.debug]))
+    process.exit(0)
 }
