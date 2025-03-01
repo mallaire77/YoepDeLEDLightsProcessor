@@ -57,13 +57,14 @@ if (options.left > 3 || options.middle > 15 || options.middle < 3 || options.rig
     process.exit(1)
 }
 
-// Execution
+// Scaffold
 const profile = JSON.parse(fs.readFileSync(options.file, 'utf8'))
 const leftStartPosition = 1
 const middleStartPosition = options.left + 1
 const rightStartPosition = options.left + options.middle + 1
 const numberOfSegments = options.middle
 
+// Validation
 const reader = createReader(profile)
 for (const path in paths) {
     if (reader.get(paths[path]) === undefined) {
@@ -72,6 +73,7 @@ for (const path in paths) {
     }
 }
 
+// Execution
 const updatedProfile =
     createMutator(profile)
         .mutate(paths.leftModulePath, container => ({
