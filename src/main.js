@@ -64,6 +64,14 @@ const middleStartPosition = options.left + 1
 const rightStartPosition = options.left + options.middle + 1
 const numberOfSegments = options.middle
 
+const reader = createReader(profile)
+for (const path in paths) {
+    if (reader.get(paths[path]) === undefined) {
+        console.error(`Path ${path} not found in profile!`)
+        process.exit(1)
+    }
+}
+
 const updatedProfile =
     createMutator(profile)
         .mutate(paths.leftModulePath, container => ({

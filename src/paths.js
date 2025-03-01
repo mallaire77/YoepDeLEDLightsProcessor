@@ -13,7 +13,7 @@ const rightSideFocusedPath = [...rpmPath, 'LedContainers', { field: 'Description
 const hpdArx01Path = [...rightSideFocusedPath, 'LedContainers', { field: 'Description', value: 'Prototype' }, 'LedContainers', { field: 'CarModel', value: 'HPD ARX-01c' }]
 
 // Middle focused
-const middleFocusedPath = [...rpmPath, 'LedContainers', { field: 'Description', value: 'Middle Focused' }]
+const middleFocusedPath = [...rpmPath, 'LedContainers', { field: 'Description', value: 'Middle Focused ' }]
 const gt3Path = [...middleFocusedPath, 'LedContainers', { field: 'Description', value: 'GT3' }]
 const gt4Path = [...middleFocusedPath, 'LedContainers', { field: 'Description', value: 'GT4' }]
 const prototypePath = [...middleFocusedPath, 'LedContainers', { field: 'Description', value: 'Prototype' }]

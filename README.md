@@ -1,5 +1,5 @@
 # Yoep-de-LEDLights Processor
-This tool allows you to post-process a Yoep-de-LEDLights adding the ability to go down to 3 LEDs in the middle, and disabling the left & right modules completely.
+This tool allows you to post-process a *Yoep-de-LEDLights* profile adding the ability to go down to 3 LEDs in the middle, and disabling the left & right modules completely.
 
 ## Usage
 ```
@@ -13,6 +13,12 @@ node src/main.js --file <profile.json> --left <count> --middle <count> --right <
 | --left | Number of LED segments for the left module | 0-3 |
 | --middle | Number of LED segments for the middle/RPM module | 3-15 |
 | --right | Number of LED segments for the right module | 0-3 |
+
+## Optional Parameters
+| Parameter | Description |
+|-----------|-------------|
+| --debug | Outputs a specific path from the profile instead of saving the file |
+
 
 ## Example
 ```
