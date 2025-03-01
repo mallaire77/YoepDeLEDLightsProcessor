@@ -1,4 +1,103 @@
 import fs from 'fs'
+import { cars } from './cars.js'
+import { paths } from './paths.js'
+
+// Arguments
+const args = process.argv.slice(2)
+const options = {}
+const requiredOptions = ['file', 'left', 'middle', 'right']
+for (let i = 0; i < args.length; i++) {
+    if (args[i].startsWith('--')) {
+        switch (args[i]) {
+            case '--file':
+                options.file = args[i + 1]
+                i++
+                break
+
+            case '--left':
+                options.left = parseInt(args[i + 1], 10)
+                i++
+                break
+
+            case '--middle':
+                options.middle = parseInt(args[i + 1], 10)
+                i++
+                break
+
+            case '--right':
+                options.right = parseInt(args[i + 1], 10)
+                i++
+                break
+
+            default:
+                console.error(`Unknown option: ${args[i]}`)
+                process.exit(1)
+        }
+    } else {
+        console.error(`Unknown argument: ${args[i]}`)
+        process.exit(1)
+    }
+}
+
+if (requiredOptions.some(option => !options[option])) {
+    console.error('Missing required options!')
+    console.error('Usage: node led-15-to-9.js --file <file> --left <left> --middle <middle> --right <right>')
+    process.exit(1)
+}
+
+if (options.left > 3 || options.middle > 15 || options.middle < 3 || options.right > 3) {
+    console.error('Invalid number of segments!')
+    console.error('Usage: node led-15-to-9.js --file <file> --left <left> --middle <middle> --right <right>')
+    process.exit(1)
+}
+
+console.log({ options })
+
+// Execution
+const profile = JSON.parse(fs.readFileSync(options.file, 'utf8'))
+const leftStartPosition = 1
+const middleStartPosition = options.left + 1
+const rightStartPosition = options.left + options.middle + 1
+const numberOfSegments = options.middle
+
+const updatedProfile =
+    createMutator(profile)
+        .mutate(paths.leftModulePath, container => ({
+            ...container,
+            IsEnabled: options.left > 0,
+            StartPosition: leftStartPosition
+        }))
+        .mutate(paths.rightModulePath, container => ({
+            ...container,
+            IsEnabled: options.right > 0,
+            StartPosition: rightStartPosition
+        }))
+        .mutate(paths.rightSideFocusedPath, container => ({
+            ...container,
+            StartPosition: middleStartPosition
+        }))
+        .mutate(paths.middleFocusedPath, container => ({
+            ...container,
+            StartPosition: middleStartPosition
+        }))
+        .mutate(cars.hpdArx01.path, cars.hpdArx01.fn(numberOfSegments))
+        .result()
+
+// Output
+const outputFile = `${options.left}-${options.middle}-${options.right}.ledsprofile`
+fs.writeFileSync(outputFile, JSON.stringify(updatedProfile, null, 2), 'utf8')
+console.log(`Updated profile saved to ${outputFile}!`)
+
+// Debug
+// const reader = createReader(updatedProfile)
+// const hpdArx01Containers = reader.get([
+//     'LedContainers',
+//     { field: 'Description', value: 'RPM' },
+//     'LedContainers',
+//     { field: 'Description', value: 'Rightside focused' },
+// ])
+
+// console.log({ hpdArx01Containers })
 
 // Functions
 function getValueFromPath(obj, path) {
@@ -152,125 +251,3 @@ function createMutator(initialObject) {
         }
     }
 }
-
-// Paths
-const leftModulePath = ['LedContainers', { field: 'Description', value: 'LEFT MODULE' }]
-const rightModulePath = ['LedContainers', { field: 'Description', value: 'RIGHT MODULE' }]
-const rpmPath = ['LedContainers', { field: 'Description', value: 'RPM' }]
-const rightSideFocusedPath = [...rpmPath, { field: 'Description', value: 'Rightside focused' }]
-const middleFocusedPath = [...rpmPath, { field: 'Description', value: 'Middle Focused' }]
-const gt3Path = [...middleFocusedPath, { field: 'Description', value: 'GT3' }]
-const gt4Path = [...middleFocusedPath, { field: 'Description', value: 'GT4' }]
-const prototypePath = [...middleFocusedPath, { field: 'Description', value: 'Prototype' }]
-const openWheelPath = [...middleFocusedPath, { field: 'Description', value: 'Open Wheel' }]
-
-const hpdArx01Path = [
-    ...rightSideFocusedPath,
-    'LedContainers', { field: 'Description', value: 'Prototype' },
-    'LedContainers', { field: 'CarModel', value: 'HPD ARX-01c' }
-]
-
-// Definitions
-const updateHpdArx01 = (numberOfSegments) => (car) => {
-    return {
-        ...car,
-        LedContainers: car.LedContainers.map(gearContainer => ({
-            ...gearContainer,
-            LedContainers: gearContainer.LedContainers.map(container => {
-                if (container.ContainerType === "RPMSegments") {
-                    return {
-                        ...container,
-                        SegmentsCount: numberOfSegments,
-                        Segments: container.Segments ? container.Segments.slice(-numberOfSegments) : []
-                    }
-                } else if (container.ContainerType === "CustomStatus" && container.hasOwnProperty("LedCount")) {
-                    return {
-                        ...container,
-                        LedCount: numberOfSegments
-                    }
-                } else {
-                    return container
-                }
-            })
-        }))
-    }
-}
-
-// Arguments
-const args = process.argv.slice(2)
-const options = {}
-const requiredOptions = ['file', 'left', 'middle', 'right']
-for (let i = 0; i < args.length; i++) {
-    if (args[i].startsWith('--')) {
-        const option = args[i].slice(2)
-        options[option] = args[i + 1]
-        i++ // Skip the next argument as it's the value
-    }
-}
-
-if (requiredOptions.some(option => !options[option])) {
-    console.error('Missing required options!')
-    console.error('Usage: node led-15-to-9.js --file <file> --left <left> --middle <middle> --right <right>')
-    process.exit(1)
-}
-
-if (options.left > 3 || options.middle > 15 || options.middle < 3 || options.right > 3) {
-    console.error('Invalid number of segments!')
-    console.error('Usage: node led-15-to-9.js --file <file> --left <left> --middle <middle> --right <right>')
-    process.exit(1)
-}
-
-options.left = parseInt(options.left, 10)
-options.middle = parseInt(options.middle, 10)
-options.right = parseInt(options.right, 10)
-console.log({ options })
-
-// Execution
-const profile = JSON.parse(fs.readFileSync(options.file, 'utf8'))
-const leftStartPosition = 1
-const middleStartPosition = options.left + 1
-const rightStartPosition = options.left + options.middle + 1
-const numberOfSegments = options.middle
-
-console.log(
-    createMutator(profile)
-        .mutate(leftModulePath, container => ({
-            ...container,
-            IsEnabled: options.left > 0,
-            StartPosition: leftStartPosition
-        }))
-        .mutate(rightModulePath, container => ({
-            ...container,
-            IsEnabled: options.right > 0,
-            StartPosition: rightStartPosition
-        }))
-        .mutate([
-            ...rpmPath,
-            'LedContainers', { field: 'Description', value: 'Rightside focused' }
-        ], container => ({
-            ...container,
-            StartPosition: middleStartPosition
-        }))
-        .mutate(middleFocusedPath, container => ({
-            ...container,
-            StartPosition: middleStartPosition
-        }))
-        .mutate(hpdArx01Path, updateHpdArx01(numberOfSegments))
-        .result()
-)
-
-// Output
-const outputFile = `${options.left}-${options.middle}-${options.right}.ledsprofile`
-fs.writeFileSync(outputFile, JSON.stringify(updatedProfile, null, 2), 'utf8')
-console.log(`Updated profile saved to ${outputFile}!`)
-
-// Debug
-// const reader = createReader(updatedProfile)
-// const hpdArx01Containers = reader.get([
-//     'LedContainers',
-//     { field: 'Description', value: 'RPM' },
-//     'LedContainers',
-//     { field: 'Description', value: 'Rightside focused' },
-// ])
-
-// console.log({ hpdArx01Containers })
