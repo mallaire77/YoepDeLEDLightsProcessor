@@ -30,6 +30,11 @@ for (let i = 0; i < args.length; i++) {
                 i++
                 break
 
+            case '--debug':
+                options.debug = args[i + 1]
+                i++
+                break
+
             default:
                 console.error(`Unknown option: ${args[i]}`)
                 process.exit(1)
@@ -40,19 +45,17 @@ for (let i = 0; i < args.length; i++) {
     }
 }
 
-if (requiredOptions.some(option => !options[option])) {
+if (requiredOptions.some(option => options[option] === undefined)) {
     console.error('Missing required options!')
-    console.error('Usage: node led-15-to-9.js --file <file> --left <left> --middle <middle> --right <right>')
+    console.error('Usage: node src/main.js --file <file> --left <left> --middle <middle> --right <right>')
     process.exit(1)
 }
 
 if (options.left > 3 || options.middle > 15 || options.middle < 3 || options.right > 3) {
     console.error('Invalid number of segments!')
-    console.error('Usage: node led-15-to-9.js --file <file> --left <left> --middle <middle> --right <right>')
+    console.error('Usage: node src/main.js --file <file> --left <left> --middle <middle> --right <right>')
     process.exit(1)
 }
-
-console.log({ options })
 
 // Execution
 const profile = JSON.parse(fs.readFileSync(options.file, 'utf8'))
@@ -85,17 +88,10 @@ const updatedProfile =
         .result()
 
 // Output
-const outputFile = `${options.left}-${options.middle}-${options.right}.ledsprofile`
-fs.writeFileSync(outputFile, JSON.stringify(updatedProfile, null, 2), 'utf8')
-console.log(`Updated profile saved to ${outputFile}!`)
-
-// Debug
-// const reader = createReader(updatedProfile)
-// const hpdArx01Containers = reader.get([
-//     'LedContainers',
-//     { field: 'Description', value: 'RPM' },
-//     'LedContainers',
-//     { field: 'Description', value: 'Rightside focused' },
-// ])
-
-// console.log({ hpdArx01Containers })
+if (!options.debug) {
+    const outputFile = `${options.left}-${options.middle}-${options.right}.ledsprofile`
+    fs.writeFileSync(outputFile, JSON.stringify(updatedProfile, null, 2), 'utf8')
+    console.log(`Profile saved to ${outputFile}!`)
+} else {
+    console.log(createReader(updatedProfile).get(paths[options.debug]))
+}

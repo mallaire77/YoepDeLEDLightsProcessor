@@ -3,7 +3,7 @@ This tool allows you to post-process a Yoep-de-LEDLights adding the ability to g
 
 ## Usage
 ```
-node main.js --file <profile.json> --left <count> --middle <count> --right <count>
+node src/main.js --file <profile.json> --left <count> --middle <count> --right <count>
 ```
 
 ## Required Parameters
@@ -16,7 +16,7 @@ node main.js --file <profile.json> --left <count> --middle <count> --right <coun
 
 ## Example
 ```
-node main.js --file 20250102_Yoep_de_LEDLights_3_15_3.ledsprofile --left 3 --middle 9 --right 3
+node src/main.js --file 20250102_Yoep_de_LEDLights_3_15_3.ledsprofile --left 3 --middle 9 --right 3
 ```
 
 This command will:
