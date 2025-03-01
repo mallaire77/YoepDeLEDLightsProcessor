@@ -1,4 +1,4 @@
-# Yoep-de-LEDLights Configuration Tool
+# Yoep-de-LEDLights Processor
 This tool allows you to post-process a Yoep-de-LEDLights adding the ability to go down to 3 LEDs in the middle, and disabling the left & right modules completely.
 
 ## Usage
