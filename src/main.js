@@ -92,8 +92,8 @@ const updatedProfile =
                 LedCount: total
             }))
         }))
-        .mutate(paths.fiaF4Path, fiaF4(middleStartPosition, options.middle))
-        .mutate(paths.mercedesW12Path, mercedesW12(middleStartPosition, options.middle))
+        .mutate(paths.fiaF4Path, fiaF4(options.middle))
+        .mutate(paths.mercedesW12Path, mercedesW12(options.middle))
         .result()
 
 // Debug or save profile
