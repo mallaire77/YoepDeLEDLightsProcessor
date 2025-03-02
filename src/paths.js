@@ -1,3 +1,6 @@
+// Root
+const rootPath = []
+
 // Left Module  
 const leftModulePath = ['LedContainers', { field: 'Description', value: 'LEFT MODULE' }]
 
@@ -44,6 +47,7 @@ export const deprecatedPaths = {
 }
 
 export const paths = {
+    rootPath,
     leftModulePath,
     rightModulePath,
     carsPath,
