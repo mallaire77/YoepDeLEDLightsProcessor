@@ -13,9 +13,19 @@ const gt4Path = [...carsPath, 'LedContainers', { field: 'Description', value: 'G
 const prototypePath = [...carsPath, 'LedContainers', { field: 'Description', value: 'Prototype' }]
 const openWheelPath = [...carsPath, 'LedContainers', { field: 'Description', value: 'Open Wheel' }]
 
-// // Open Wheel
+// Open Wheel - Feeder Series
 const openWheelFeederSeriesPath = [...openWheelPath, 'LedContainers', { field: 'Description', value: 'Feeder Series' }]
+const fiaF4Path = [...openWheelFeederSeriesPath, 'LedContainers', { field: 'Description', value: 'FIA F4' }]
+
+// Open Wheel - Formula 1
+const openWheelFormula1Path = [...openWheelPath, 'LedContainers', { field: 'Description', value: 'Formula 1' }]
+const mercedesW12Path = [...openWheelFormula1Path, 'LedContainers', { field: 'CarModel', value: 'Mercedes W12' }]
+const mercedesW13Path = [...openWheelFormula1Path, 'LedContainers', { field: 'CarModel', value: 'Mercedes-AMG W13 E Performance' }]
+
+// Open Wheel - Super Formula
 const openWheelSuperFormulaPath = [...openWheelPath, 'LedContainers', { field: 'Description', value: 'Super Formula' }]
+
+// Open Wheel - Various
 const openWheelVariousPath = [...openWheelPath, 'LedContainers', { field: 'Description', value: 'Various' }]
 
 // Miscellaneous
@@ -41,6 +51,9 @@ export const paths = {
     gt4Path,
     prototypePath,
     openWheelPath,
+    fiaF4Path,
+    mercedesW12Path,
+    mercedesW13Path,
     carsNotRunningPath,
     gameNotRunningPath
 }

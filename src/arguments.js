@@ -1,17 +1,18 @@
 export const getArguments = () => {
     const args = process.argv.slice(2)
     const options = {
+        reference: '20250102',
         left: 3,
         middle: 15,
         right: 3,
         debug: false
     }
-    const requiredOptions = ['file', 'left', 'middle', 'right']
+    const requiredOptions = ['reference', 'left', 'middle', 'right']
     for (let i = 0; i < args.length; i++) {
         if (args[i].startsWith('--')) {
             switch (args[i]) {
-                case '--file':
-                    options.file = args[i + 1]
+                case '--reference':
+                    options.reference = args[i + 1]
                     i++
                     break
 
@@ -49,7 +50,7 @@ export const getArguments = () => {
         console.error('Missing or invalid required options!')
         console.error('Usage: node src/main.js --file <file> --left <left> --middle <middle> --right <right>')
         process.exit(1)
-    } else if (options.left > 3 || options.middle > 15 || options.middle < 3 || options.right > 3) {
+    } else if (options.left > 3 || options.middle > 15 || options.middle < 5 || options.right > 3) {
         console.error('Invalid number of segments!')
         console.error('Usage: node src/main.js --file <file> --left <left> --middle <middle> --right <right>')
         process.exit(1)

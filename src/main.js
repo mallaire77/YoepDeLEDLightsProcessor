@@ -1,12 +1,23 @@
 import fs from 'fs'
-import { cars } from './cars.js'
 import { createMutator, createReader } from './functions.js'
 import { deprecatedPaths, paths } from './paths.js'
 import { getArguments } from './arguments.js'
 
+// Car Imports
+import { fiaF4 } from './cars/fia_f4.js'
+import { mercedesW12 } from './cars/mercedes_w12.js'
+
+const profilesDir = './profiles'
+if (!fs.existsSync(profilesDir)) {
+    console.error(`Error: Profiles directory not found at ${profilesDir}`)
+    console.error('Please create a "profiles" directory in the project root and add your profile files there.')
+    process.exit(1)
+}
+
 // Scaffold
 const options = getArguments()
-const profile = JSON.parse(fs.readFileSync(options.file, 'utf8'))
+const configuration = options.middle % 2 === 0 ? '3_16_3' : '3_15_3'
+const profile = JSON.parse(fs.readFileSync(`./profiles/${options.reference}_Yoep_de_LEDLights_${configuration}.ledsprofile`, 'utf8'))
 const leftStartPosition = 1
 const middleStartPosition = options.left + 1
 const rightStartPosition = options.left + options.middle + 1
@@ -81,6 +92,8 @@ const updatedProfile =
                 LedCount: total
             }))
         }))
+        .mutate(paths.fiaF4Path, fiaF4(middleStartPosition, options.middle))
+        .mutate(paths.mercedesW12Path, mercedesW12(middleStartPosition, options.middle))
         .result()
 
 // Debug or save profile
