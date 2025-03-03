@@ -177,6 +177,7 @@ export function movePath(obj, sourcePath, targetPath) {
 
     // If the value doesn't exist, return the original object
     if (value === undefined) {
+        console.log('Source value is undefined, returning original object')
         return obj
     }
 

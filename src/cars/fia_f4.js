@@ -1,6 +1,5 @@
-import { countSegments } from './common.js'
+import { downsizeRPMSegmentsContainer } from './common.js'
 
-// Reference:
 // {
 //   "CarModel": "FIA F4",
 //     "LedContainers": [
@@ -46,39 +45,29 @@ import { countSegments } from './common.js'
 //     "ContainerType": "Groups.GameCarModelGroup",
 //     "Description": "FIA F4"
 // }
-export const fiaF4 = (startPosition, numberOfSegments) => (car) => {
-  return {
-    ...car,
-    LedContainers: car.LedContainers.map(container => {
-      if (container.ContainerType === "RPMSegments") {
-        const segments = countSegments(container.Segments)
-        if (segments <= numberOfSegments) {
-          return {
-            ...container,
-            StartPosition: startPosition + ((numberOfSegments - segments) / 2),
-          }
-        } else {
-          return {
-            ...container,
-            StartPosition: startPosition,
-            Segments: downsizeSegments(container.Segments, numberOfSegments),
-          }
+export const fiaF4 = (numLeds) => (car) => {
+  const processContainers = (container) => {
+    const result = { ...container }
+
+    if (result.LedContainers) {
+      result.LedContainers = result.LedContainers.map(processContainers)
+    }
+
+    switch (result.ContainerType) {
+      case "RPMSegments":
+        return downsizeRPMSegmentsContainer(result, numLeds)
+
+      case "CustomStatus":
+        return {
+          ...result,
+          StartPosition: 1,
+          LedCount: numLeds
         }
-      } else if (container.ContainerType === "CustomStatus" && container.hasOwnProperty("LedCount")) {
-        if (container.LedCount <= numberOfSegments) {
-          return {
-            ...container,
-            StartPosition: startPosition + ((numberOfSegments - container.LedCount) / 2),
-          }
-        } else {
-          return {
-            ...container,
-            StartPosition: startPosition,
-          }
-        }
-      } else {
-        return container
-      }
-    })
+
+      default:
+        return result
+    }
   }
+
+  return processContainers(car)
 }

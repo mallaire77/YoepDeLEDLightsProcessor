@@ -1,5 +1,6 @@
 import fs from 'fs'
-import { createMutator, createReader } from './functions.js'
+import crypto from 'crypto'
+import { createMutator, createReader } from './common.js'
 import { deprecatedPaths, paths } from './paths.js'
 import { getArguments } from './arguments.js'
 
@@ -16,8 +17,9 @@ if (!fs.existsSync(profilesDir)) {
 
 // Scaffold
 const options = getArguments()
-const configuration = options.middle % 2 === 0 ? '3_16_3' : '3_15_3'
-const profile = JSON.parse(fs.readFileSync(`./profiles/${options.reference}_Yoep_de_LEDLights_${configuration}.ledsprofile`, 'utf8'))
+const isEven = options.middle % 2 === 0
+const configuration = isEven ? '3_16_3' : '3_15_3'
+const profile = JSON.parse(fs.readFileSync(`./profiles/${options.version}_Yoep_de_LEDLights_${configuration}.ledsprofile`, 'utf8'))
 const leftStartPosition = 1
 const middleStartPosition = options.left + 1
 const rightStartPosition = options.left + options.middle + 1
@@ -26,17 +28,30 @@ const total = options.left + options.middle + options.right
 // Validate original profile
 const reader = createReader(profile)
 for (const path in deprecatedPaths) {
-    if (path !== 'movedMiddleFocusedPath' && reader.get(deprecatedPaths[path]) === undefined) {
-        console.error(`Deprecated path ${path} not found in profile!`)
-        process.exit(1)
-    }
+    reader.exists(deprecatedPaths[path])
 }
 
-// Pre-process original profile (modify structure)
+let profileSpecificPreProcess
+if (isEven) {
+    reader.exists(deprecatedPaths.hpdArx01PathEven)
+    // Pre-process original profile (modify structure)
+    profileSpecificPreProcess =
+        createMutator(profile)
+            .move(deprecatedPaths.hpdArx01PathEven, deprecatedPaths.middleFocusedPrototypePath)
+            .delete(deprecatedPaths.rightSideFocusedPath)
+            .result()
+} else {
+    reader.exists(deprecatedPaths.hpdArx01PathUneven)
+    profileSpecificPreProcess =
+        createMutator(profile)
+            .move(deprecatedPaths.hpdArx01PathUneven, deprecatedPaths.middleFocusedPrototypePath)
+            .delete(deprecatedPaths.rightSideFocusedPath)
+            .result()
+}
+
 const preProcessedProfile =
-    createMutator(profile)
-        .move(deprecatedPaths.hpdArx01Path, deprecatedPaths.middleFocusedPrototypePath)
-        .delete(deprecatedPaths.rightSideFocusedPath)
+    createMutator(profileSpecificPreProcess)
+        // Macro Re-structure
         .move(deprecatedPaths.middleFocusedPath, deprecatedPaths.rpmPath)
         .mutate(deprecatedPaths.movedMiddleFocusedPath, container => ({
             ...container,
@@ -44,8 +59,14 @@ const preProcessedProfile =
         }))
         .mutate([], container => ({
             ...container,
-            Name: `${container.Name.substring(0, container.Name.indexOf("LEDLights") === -1 ? container.Name.length : container.Name.indexOf("LEDLights") + "LEDLights".length)} ${options.left}-${options.middle}-${options.right}`
+            Name: `${container.Name.substring(0, container.Name.indexOf("LEDLights") + "LEDLights".length)} ${options.left}-${options.middle}-${options.right} v2`,
+            ProfileId: crypto.randomUUID()
         }))
+        // Micro Re-structure
+        .move(deprecatedPaths.leftModuleMercedesW12DrsPath, paths.mercedesW12ContainerPath)
+        .move(deprecatedPaths.leftModuleMercedesW13DrsPath, paths.mercedesW13ContainerPath)
+        // Cleanup
+        .delete(deprecatedPaths.leftModuleFormula1Path)
         .delete(deprecatedPaths.wipPath)
         .delete(deprecatedPaths.testLedsGameDataPath)
         .result()
@@ -53,60 +74,83 @@ const preProcessedProfile =
 // Validate pre-processed profile
 const preProcessedReader = createReader(preProcessedProfile)
 for (const path in paths) {
-    if (preProcessedReader.get(paths[path]) === undefined) {
-        console.error(`Path ${path} not found in pre-processed profile!`)
-        process.exit(1)
-    }
+    preProcessedReader.exists(paths[path])
 }
 
-// Update pre-processed profile cars according to arguments
-const updatedProfile =
-    createMutator(preProcessedProfile)
-        .mutate(paths.leftModulePath, container => ({
-            ...container,
-            IsEnabled: options.left > 0,
-            StartPosition: leftStartPosition
-        }))
-        .mutate(paths.rightModulePath, container => ({
-            ...container,
-            IsEnabled: options.right > 0,
-            StartPosition: rightStartPosition
-        }))
-        .mutate(paths.carsPath, container => ({
-            ...container,
-            StartPosition: middleStartPosition
-        }))
-        .mutate(paths.carsNotRunningPath, container => ({
-            ...container,
-            StartPosition: leftStartPosition,
-            LedContainers: container.LedContainers.map(ledContainer => ({
-                ...ledContainer,
-                LedCount: total
-            }))
-        }))
-        .mutate(paths.gameNotRunningPath, container => ({
-            ...container,
-            StartPosition: leftStartPosition,
-            LedContainers: container.LedContainers.map(ledContainer => ({
-                ...ledContainer,
-                LedCount: total
-            }))
-        }))
-        .mutate(paths.fiaF4Path, fiaF4(options.middle))
-        .mutate(paths.mercedesW12Path, mercedesW12(options.middle))
-        .result()
-
-// Debug or save profile
-if (options.debug) {
-    console.log(createReader(updatedProfile).get(paths[options.debug]))
-    process.exit(0)
-} else {
-    if (!fs.existsSync('./outputs')) {
-        fs.mkdirSync('./outputs', { recursive: true })
+if (options.preprocess) {
+    if (!fs.existsSync('./profiles/v2')) {
+        fs.mkdirSync('./profiles/v2', { recursive: true })
     }
 
-    const outputFile = `./outputs/${options.left}-${options.middle}-${options.right}.ledsprofile`
-    fs.writeFileSync(outputFile, JSON.stringify(updatedProfile, null, 2), 'utf8')
+    const outputFile = `./profiles/v2/${options.version}_Yoep_de_LEDLights_${configuration}.ledsprofile`
+    fs.writeFileSync(outputFile, JSON.stringify(preProcessedProfile, null, 2), 'utf8')
     console.log(`Profile saved to ${outputFile}!`)
     process.exit(0)
+} else {
+    let macroUpdatedProfile =
+        createMutator(preProcessedProfile)
+            .mutate(paths.leftModulePath, container => ({
+                ...container,
+                IsEnabled: options.left > 0,
+                StartPosition: leftStartPosition
+            }))
+            .mutate(paths.rightModulePath, container => ({
+                ...container,
+                IsEnabled: options.right > 0,
+                StartPosition: rightStartPosition
+            }))
+            .mutate(paths.carsPath, container => ({
+                ...container,
+                IsEnabled: options.middle > 0,
+                StartPosition: middleStartPosition
+            }))
+            .mutate(paths.carsNotRunningPath, container => ({
+                ...container,
+                StartPosition: leftStartPosition,
+                LedContainers: container.LedContainers.map(ledContainer => ({
+                    ...ledContainer,
+                    LedCount: total
+                }))
+            }))
+            .mutate(paths.gameNotRunningPath, container => ({
+                ...container,
+                StartPosition: leftStartPosition,
+                LedContainers: container.LedContainers.map(ledContainer => ({
+                    ...ledContainer,
+                    LedCount: total
+                }))
+            }))
+            .result()
+
+    let updatedLeftModule = macroUpdatedProfile
+    if (options.left > 0 && options.left < 3) {
+    }
+
+    let updatedRightModule = updatedLeftModule
+    if (options.right > 0 && options.right < 3) {
+    }
+
+    let finalProfile = updatedRightModule
+    if (options.middle > 0 && options.middle < 15) {
+        finalProfile =
+            createMutator(finalProfile)
+                .mutate(paths.fiaF4Path, fiaF4(options.middle))
+                .mutate(paths.mercedesW12Path, mercedesW12(options.middle))
+                .result()
+    }
+
+    // Debug or save profile
+    if (options.debug) {
+        console.log(createReader(finalProfile).get(paths[options.debug]))
+        process.exit(0)
+    } else {
+        if (!fs.existsSync('./outputs')) {
+            fs.mkdirSync('./outputs', { recursive: true })
+        }
+
+        const outputFile = `./outputs/${options.left}-${options.middle}-${options.right}.ledsprofile`
+        fs.writeFileSync(outputFile, JSON.stringify(finalProfile, null, 2), 'utf8')
+        console.log(`Profile saved to ${outputFile}!`)
+        process.exit(0)
+    }
 }

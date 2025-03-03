@@ -5,6 +5,7 @@ export const getArguments = () => {
         left: 3,
         middle: 16,
         right: 3,
+        preprocess: false,
         debug: undefined
     }
     for (let i = 0; i < args.length; i++) {
@@ -28,6 +29,10 @@ export const getArguments = () => {
                 case '--right':
                     options.right = parseInt(args[i + 1], 10)
                     i++
+                    break
+
+                case '--pre-process':
+                    options.preprocess = true
                     break
 
                 case '--debug':

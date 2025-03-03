@@ -3,10 +3,7 @@
     "version": "1.0.0",
     "type": "module",
     "private": true,
-    "scripts": {
-        "start": "node src/main.js"
-    },
-    "dependencies": {
-        "fs": "^0.0.1-security"
+    "devDependencies": {
+        "jest": "^29.7.0"
     }
 }
