@@ -360,13 +360,19 @@ export const mercedesW12 = (numLeds) => (car) => {
         return downsizeRPMSegmentsContainer(result, actualNumLeds, drsLeds + 1)
 
       case "Animation":
-        return downsizeAnimationContainer(result, actualNumLeds)
+        return downsizeAnimationContainer(result, numLeds)
 
       case "CustomStatus":
         return {
           ...result,
           StartPosition: 1,
           LedCount: 1
+        }
+
+      case "Groups.GameCarSpeedLimiterGroup":
+        return {
+          ...result,
+          StartPosition: 1,
         }
 
       case "Status.DrsAvailable":
