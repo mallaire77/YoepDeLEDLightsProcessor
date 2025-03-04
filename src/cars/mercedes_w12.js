@@ -362,17 +362,17 @@ export const mercedesW12 = (numLeds) => (car) => {
       case "Animation":
         return downsizeAnimationContainer(result, numLeds)
 
+      case "Groups.GameCarSpeedLimiterGroup":
+        return {
+          ...result,
+          StartPosition: 1,
+        }
+
       case "CustomStatus":
         return {
           ...result,
           StartPosition: 1,
           LedCount: 1
-        }
-
-      case "Groups.GameCarSpeedLimiterGroup":
-        return {
-          ...result,
-          StartPosition: 1,
         }
 
       case "Status.DrsAvailable":
