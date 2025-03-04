@@ -4,6 +4,44 @@
 // - If targetNumLeds is even the the number of leds will have an even number
 // - If targetNumLeds is uneven the number of leds will have be an uneven number
 // - targetNumLeds is a range from 0-16
+export const downsizeCar = (numLeds) => (car) => {
+  const processContainers = (container) => {
+    const result = { ...container }
+
+    if (result.LedContainers) {
+      result.LedContainers = result.LedContainers.map(processContainers)
+    }
+
+    switch (result.ContainerType) {
+      case "RPMSegments":
+        return downsizeRPMSegmentsContainer(result, numLeds)
+
+      case "Animation":
+        return downsizeAnimationContainer(result, numLeds)
+
+      case "CustomStatus":
+      case "StaticColor":
+        if (container.LedCount <= numLeds) {
+          return {
+            ...result,
+            StartPosition: Math.round((numLeds - container.LedCount) / 2),
+            LedCount: numLeds
+          }
+        } else {
+          return {
+            ...result,
+            StartPosition: 1,
+            LedCount: numLeds
+          }
+        }
+
+      default:
+        return result
+    }
+  }
+
+  return processContainers(car)
+}
 
 export const downsizeRPMSegmentsContainer = (segmentContainer, targetNumLeds, startPosition = 1, debug = false) => {
   const numLeds = countSegmentLeds(segmentContainer.Segments)

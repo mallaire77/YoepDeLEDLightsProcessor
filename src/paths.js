@@ -22,6 +22,14 @@ const p499Path = [...prototypePath, 'LedContainers', { field: 'CarModel', value:
 const p217Path = [...prototypePath, 'LedContainers', { field: 'CarModel', value: 'Dallara P217 LMP2' }]
 const vSeriesRPath = [...prototypePath, 'LedContainers', { field: 'CarModel', value: 'Cadillac V-Series.R' }]
 
+// GT3
+const gt3Path = [...carsPath, 'LedContainers', { field: 'Description', value: 'GT3' }]
+const gt3296Path = [...gt3Path, 'LedContainers', { field: 'CarModel', value: 'Ferrari 296 GT3' }]
+const gt3Amg2020Path = [...gt3Path, 'LedContainers', { field: 'CarModel', value: 'Mercedes-AMG GT3 2020' }]
+const gt3911RPath = [...gt3Path, 'LedContainers', { field: 'CarModel', value: 'Porsche 911 GT3 R (992)' }]
+const gt3720sPath = [...gt3Path, 'LedContainers', { field: 'CarModel', value: 'McLaren 720S GT3 EVO' }]
+const gt3M4Path = [...gt3Path, 'LedContainers', { field: 'CarModel', value: 'BMW M4 GT3' }]
+
 // Open Wheel - Various
 const openWheelPath = [...carsPath, 'LedContainers', { field: 'Description', value: 'Open Wheel' }]
 const openWheelVariousPath = [...openWheelPath, 'LedContainers', { field: 'Description', value: 'Various' }]
@@ -68,6 +76,14 @@ export const paths = {
     p499Path,
     p217Path,
     vSeriesRPath,
+
+    // GT3
+    gt3Path,
+    gt3296Path,
+    gt3Amg2020Path,
+    gt3911RPath,
+    gt3720sPath,
+    gt3M4Path,
 
     // Open Wheel
     openWheelPath,

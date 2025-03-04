@@ -1,28 +1,16 @@
 import fs from 'fs'
 import crypto from 'crypto'
+import args from './args.js'
+import wheels from './wheels.js'
+import { downsizeCar } from './cars/common.js'
 import { createMutator, createReader } from './common.js'
 import { deprecatedPaths, paths } from './paths.js'
-import { getArguments } from './arguments.js'
 
-// Various
-import { mx5 } from './cars/mx5.js'
-import { gr86 } from './cars/gr86.js'
-import { m2 } from './cars/m2.js'
-
-// Prototype
-import { p499 } from './cars/499p.js'
-import { p217 } from './cars/p217.js'
-import { vSeriesR } from './cars/v_series_r.js'
+// GT3
+import gt3296 from './cars/296_gt3.js'
 
 // Open Wheel
-import { formulaVee } from './cars/formula_vee.js'
-import { formulaFord } from './cars/formula_ford.js'
-import { formula2000 } from './cars/formula_2000.js'
-import { f4 } from './cars/f4.js'
-import { f3 } from './cars/f3.js'
-import { superFormulaLights } from './cars/super_formula_lights.js'
-import { superFormula } from './cars/super_formula.js'
-import { mercedesW12 } from './cars/mercedes_w12.js'
+import mercedesW12 from './cars/mercedes_w12.js'
 
 const profilesDir = './profiles'
 if (!fs.existsSync(profilesDir)) {
@@ -32,14 +20,18 @@ if (!fs.existsSync(profilesDir)) {
 }
 
 // Scaffold
-const options = getArguments()
+const options = args()
+const settings = options.wheel ? wheels[options.wheel] : options.settings
 const isEven = options.middle % 2 === 0
 const configuration = isEven ? '3_16_3' : '3_15_3'
 const profile = JSON.parse(fs.readFileSync(`./profiles/${options.version}_Yoep_de_LEDLights_${configuration}.ledsprofile`, 'utf8'))
-const leftStartPosition = 1
-const middleStartPosition = options.left + 1
-const rightStartPosition = options.left + options.middle + 1
-const total = options.left + options.middle + options.right
+const left = settings.left
+const middle = settings.middle
+const right = settings.right
+const leftStartPosition = settings.customLeftStart ? settings.customLeftStart : 1
+const middleStartPosition = settings.customMiddleStart ? settings.customMiddleStart : left + 1
+const rightStartPosition = settings.customRightStart ? settings.customRightStart : middleStartPosition + 1
+const total = left + middle + right
 
 // Validate original profile
 const reader = createReader(profile)
@@ -86,12 +78,20 @@ const preProcessedProfile =
         }))
         .mutate([], container => ({
             ...container,
-            Name: `${container.Name.substring(0, container.Name.indexOf("LEDLights") + "LEDLights".length)} ${options.left}-${options.middle}-${options.right} v2`,
+            Name: `${container.Name.substring(0, container.Name.indexOf("LEDLights") + "LEDLights".length)} ${left}-${middle}-${right} v2`,
             ProfileId: crypto.randomUUID()
         }))
         // Micro Re-structure
         .move(deprecatedPaths.leftModuleMercedesW12DrsPath, paths.mercedesW12ContainerPath)
         .move(deprecatedPaths.leftModuleMercedesW13DrsPath, paths.mercedesW13ContainerPath)
+        .mutate(paths.formulaVeePath, car => ({
+            ...car,
+            StartPosition: 1
+        }))
+        .mutate([...paths.formulaFordPath, 'LedContainers', { field: 'ContainerType', value: 'Groups.CustomConditionalGroup' }], car => ({
+            ...car,
+            StartPosition: 1
+        }))
         // Cleanup
         .delete(deprecatedPaths.leftModuleFormula1Path)
         .delete(deprecatedPaths.wipPath)
@@ -117,21 +117,21 @@ if (options.preprocess) {
     console.log(`Profile saved to ${outputFile}!`)
     process.exit(0)
 } else {
-    let macroUpdatedProfile =
+    let updatedProfile =
         createMutator(preProcessedProfile)
             .mutate(paths.leftModulePath, container => ({
                 ...container,
-                IsEnabled: options.left > 0,
+                IsEnabled: left > 0,
                 StartPosition: leftStartPosition
             }))
             .mutate(paths.rightModulePath, container => ({
                 ...container,
-                IsEnabled: options.right > 0,
+                IsEnabled: right > 0,
                 StartPosition: rightStartPosition
             }))
             .mutate(paths.carsPath, container => ({
                 ...container,
-                IsEnabled: options.middle > 0,
+                IsEnabled: middle > 0,
                 StartPosition: middleStartPosition
             }))
             .mutate(paths.carsNotRunningPath, container => ({
@@ -150,50 +150,34 @@ if (options.preprocess) {
                     LedCount: total
                 }))
             }))
+            .mutate(paths.mx5Path, downsizeCar(middle))
+            .mutate(paths.gr86Path, downsizeCar(middle))
+            .mutate(paths.m2Path, downsizeCar(middle))
+            .mutate(paths.p499Path, downsizeCar(middle))
+            .mutate(paths.p217Path, downsizeCar(middle))
+            .mutate(paths.vSeriesRPath, downsizeCar(middle))
+            .mutate(paths.gt3M4Path, downsizeCar(middle))
+            .mutate(paths.gt3296Path, gt3296(middle))
+            .mutate(paths.gt3720sPath, downsizeCar(middle))
+            .mutate(paths.gt3911RPath, downsizeCar(middle))
+            .mutate(paths.gt3Amg2020Path, downsizeCar(middle))
+            .mutate(paths.formulaVeePath, downsizeCar(middle))
+            .mutate(paths.formulaFordPath, downsizeCar(middle))
+            .mutate(paths.formula2000Path, downsizeCar(middle))
+            .mutate(paths.f4Path, downsizeCar(middle))
+            .mutate(paths.f3Path, downsizeCar(middle))
+            .mutate(paths.superFormulaLightsPath, downsizeCar(middle))
+            .mutate(paths.superFormulaHondaPath, downsizeCar(middle))
+            .mutate(paths.superFormulaToyotaPath, downsizeCar(middle))
+            .mutate(paths.mercedesW12Path, mercedesW12(middle))
             .result()
 
-    let updatedLeftModule = macroUpdatedProfile
-    if (options.left > 0 && options.left < 3) {
+    if (!fs.existsSync('./outputs')) {
+        fs.mkdirSync('./outputs', { recursive: true })
     }
 
-    let updatedRightModule = updatedLeftModule
-    if (options.right > 0 && options.right < 3) {
-    }
-
-    let finalProfile = updatedRightModule
-    if (options.middle > 0 && options.middle < 15) {
-        finalProfile =
-            createMutator(finalProfile)
-                .mutate(paths.mx5Path, mx5(options.middle))
-                .mutate(paths.gr86Path, gr86(options.middle))
-                .mutate(paths.m2Path, m2(options.middle))
-                .mutate(paths.p499Path, p499(options.middle))
-                .mutate(paths.p217Path, p217(options.middle))
-                .mutate(paths.vSeriesRPath, vSeriesR(options.middle))
-                .mutate(paths.formulaVeePath, formulaVee(options.middle))
-                .mutate(paths.formulaFordPath, formulaFord(options.middle))
-                .mutate(paths.formula2000Path, formula2000(options.middle))
-                .mutate(paths.f4Path, f4(options.middle))
-                .mutate(paths.f3Path, f3(options.middle))
-                .mutate(paths.superFormulaLightsPath, superFormulaLights(options.middle))
-                .mutate(paths.superFormulaHondaPath, superFormula(options.middle))
-                .mutate(paths.superFormulaToyotaPath, superFormula(options.middle))
-                .mutate(paths.mercedesW12Path, mercedesW12(options.middle))
-                .result()
-    }
-
-    // Debug or save profile
-    if (options.debug) {
-        console.log(createReader(finalProfile).get(paths[options.debug]))
-        process.exit(0)
-    } else {
-        if (!fs.existsSync('./outputs')) {
-            fs.mkdirSync('./outputs', { recursive: true })
-        }
-
-        const outputFile = `./outputs/${options.left}-${options.middle}-${options.right}.ledsprofile`
-        fs.writeFileSync(outputFile, JSON.stringify(finalProfile, null, 2), 'utf8')
-        console.log(`Profile saved to ${outputFile}!`)
-        process.exit(0)
-    }
+    const outputFile = `./outputs/${left}-${middle}-${right}.ledsprofile`
+    fs.writeFileSync(outputFile, JSON.stringify(updatedProfile, null, 2), 'utf8')
+    console.log(`Profile saved to ${outputFile}!`)
+    process.exit(0)
 }
