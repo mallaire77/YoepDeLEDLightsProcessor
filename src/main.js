@@ -159,7 +159,7 @@ if (options.preprocess) {
             .mutate(paths.vSeriesRPath, downsizeCar(middle))
             .mutate(paths.gt3M4Path, downsizeCar(middle))
             .mutate(paths.gt3296Path, gt3296(middle))
-            .mutate(paths.gt3720sPath, downsizeCar(middle))
+            .mutate(paths.gt3720sPath, downsizeCar(middle, true))
             .mutate(paths.gt3911RPath, downsizeCar(middle))
             .mutate(paths.gt3Amg2020Path, downsizeCar(middle))
             .mutate(paths.formulaVeePath, downsizeCar(middle))
