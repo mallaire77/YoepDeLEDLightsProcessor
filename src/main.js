@@ -4,8 +4,24 @@ import { createMutator, createReader } from './common.js'
 import { deprecatedPaths, paths } from './paths.js'
 import { getArguments } from './arguments.js'
 
-// Car Imports
-import { fiaF4 } from './cars/fia_f4.js'
+// Various
+import { mx5 } from './cars/mx5.js'
+import { gr86 } from './cars/gr86.js'
+import { m2 } from './cars/m2.js'
+
+// Prototype
+import { p499 } from './cars/499p.js'
+import { p217 } from './cars/p217.js'
+import { vSeriesR } from './cars/v_series_r.js'
+
+// Open Wheel
+import { formulaVee } from './cars/formula_vee.js'
+import { formulaFord } from './cars/formula_ford.js'
+import { formula2000 } from './cars/formula_2000.js'
+import { f4 } from './cars/f4.js'
+import { f3 } from './cars/f3.js'
+import { superFormulaLights } from './cars/super_formula_lights.js'
+import { superFormula } from './cars/super_formula.js'
 import { mercedesW12 } from './cars/mercedes_w12.js'
 
 const profilesDir = './profiles'
@@ -134,7 +150,20 @@ if (options.preprocess) {
     if (options.middle > 0 && options.middle < 15) {
         finalProfile =
             createMutator(finalProfile)
-                .mutate(paths.fiaF4Path, fiaF4(options.middle))
+                .mutate(paths.mx5Path, mx5(options.middle))
+                .mutate(paths.gr86Path, gr86(options.middle))
+                .mutate(paths.m2Path, m2(options.middle))
+                .mutate(paths.p499Path, p499(options.middle))
+                .mutate(paths.p217Path, p217(options.middle))
+                .mutate(paths.vSeriesRPath, vSeriesR(options.middle))
+                .mutate(paths.formulaVeePath, formulaVee(options.middle))
+                .mutate(paths.formulaFordPath, formulaFord(options.middle))
+                .mutate(paths.formula2000Path, formula2000(options.middle))
+                .mutate(paths.f4Path, f4(options.middle))
+                .mutate(paths.f3Path, f3(options.middle))
+                .mutate(paths.superFormulaLightsPath, superFormulaLights(options.middle))
+                .mutate(paths.superFormulaHondaPath, superFormula(options.middle))
+                .mutate(paths.superFormulaToyotaPath, superFormula(options.middle))
                 .mutate(paths.mercedesW12Path, mercedesW12(options.middle))
                 .result()
     }

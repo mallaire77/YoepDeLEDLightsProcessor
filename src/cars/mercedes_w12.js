@@ -342,8 +342,6 @@ import { downsizeRPMSegmentsContainer, downsizeAnimationContainer } from './comm
 //   "ContainerType": "Groups.GameCarModelGroup",
 //   "Description": "Mercedes W12"
 // }
-
-
 export const mercedesW12 = (numLeds) => (car) => {
   const drsLeds = numLeds < 14 ? 2 : 4
   const actualNumLeds = numLeds < drsLeds ? numLeds : numLeds - drsLeds

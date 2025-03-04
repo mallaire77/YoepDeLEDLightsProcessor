@@ -45,7 +45,7 @@ import { downsizeRPMSegmentsContainer } from './common.js'
 //     "ContainerType": "Groups.GameCarModelGroup",
 //     "Description": "FIA F4"
 // }
-export const fiaF4 = (numLeds) => (car) => {
+export const f4 = (numLeds) => (car) => {
   const processContainers = (container) => {
     const result = { ...container }
 
@@ -58,10 +58,18 @@ export const fiaF4 = (numLeds) => (car) => {
         return downsizeRPMSegmentsContainer(result, numLeds)
 
       case "CustomStatus":
-        return {
-          ...result,
-          StartPosition: 1,
-          LedCount: numLeds
+        if (container.LedCount <= numLeds) {
+          return {
+            ...result,
+            StartPosition: Math.round((numLeds - container.LedCount) / 2),
+            LedCount: numLeds
+          }
+        } else {
+          return {
+            ...result,
+            StartPosition: 1,
+            LedCount: numLeds
+          }
         }
 
       default:

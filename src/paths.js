@@ -10,15 +10,35 @@ const rightModulePath = ['LedContainers', { field: 'Description', value: 'RIGHT 
 // Cars
 const carsPath = ['LedContainers', { field: 'Description', value: 'Cars' }]
 
-// Car Classes
-const gt3Path = [...carsPath, 'LedContainers', { field: 'Description', value: 'GT3' }]
-const gt4Path = [...carsPath, 'LedContainers', { field: 'Description', value: 'GT4' }]
+// Various
+const variousPath = [...carsPath, 'LedContainers', { field: 'Description', value: 'Various' }]
+const mx5Path = [...variousPath, 'LedContainers', { field: 'CarModel', value: 'Mazda MX-5 Cup' }]
+const gr86Path = [...variousPath, 'LedContainers', { field: 'CarModel', value: 'Toyota GR86' }]
+const m2Path = [...variousPath, 'LedContainers', { field: 'CarModel', value: 'BMW M2 CS Racing' }]
+
+// Prototype
 const prototypePath = [...carsPath, 'LedContainers', { field: 'Description', value: 'Prototype' }]
+const p499Path = [...prototypePath, 'LedContainers', { field: 'CarModel', value: 'Ferrari 499P' }]
+const p217Path = [...prototypePath, 'LedContainers', { field: 'CarModel', value: 'Dallara P217 LMP2' }]
+const vSeriesRPath = [...prototypePath, 'LedContainers', { field: 'CarModel', value: 'Cadillac V-Series.R GTP' }]
+
+// Open Wheel - Various
 const openWheelPath = [...carsPath, 'LedContainers', { field: 'Description', value: 'Open Wheel' }]
+const openWheelVariousPath = [...openWheelPath, 'LedContainers', { field: 'Description', value: 'Various' }]
+const formulaVeePath = [...openWheelVariousPath, 'LedContainers', { field: 'CarModel', value: 'Formula Vee' }]
+const formulaFordPath = [...openWheelVariousPath, 'LedContainers', { field: 'CarModel', value: 'Ray Formula 1600' }]
+const formula2000Path = [...openWheelVariousPath, 'LedContainers', { field: 'CarModel', value: 'Skip Barber Formula 2000' }]
 
 // Open Wheel - Feeder Series
 const openWheelFeederSeriesPath = [...openWheelPath, 'LedContainers', { field: 'Description', value: 'Feeder Series' }]
-const fiaF4Path = [...openWheelFeederSeriesPath, 'LedContainers', { field: 'Description', value: 'FIA F4' }]
+const f4Path = [...openWheelFeederSeriesPath, 'LedContainers', { field: 'CarModel', value: 'FIA F4' }]
+const f3Path = [...openWheelFeederSeriesPath, 'LedContainers', { field: 'CarModel', value: 'Dallara F312 F3' }]
+
+// Open Wheel - Super Formula
+const superFormulaPath = [...openWheelPath, 'LedContainers', { field: 'Description', value: 'Super Formula' }]
+const superFormulaLightsPath = [...superFormulaPath, 'LedContainers', { field: 'CarModel', value: 'Super Formula Lights 324' }]
+const superFormulaHondaPath = [...superFormulaPath, 'LedContainers', { field: 'CarModel', value: 'Super Formula SF23 - Honda' }]
+const superFormulaToyotaPath = [...superFormulaPath, 'LedContainers', { field: 'CarModel', value: 'Super Formula SF23 - Toyota' }]
 
 // Open Wheel - Formula 1
 const openWheelFormula1Path = [...openWheelPath, 'LedContainers', { field: 'Description', value: 'Formula 1' }]
@@ -27,15 +47,46 @@ const mercedesW12ContainerPath = [...mercedesW12Path, 'LedContainers', { field: 
 const mercedesW13Path = [...openWheelFormula1Path, 'LedContainers', { field: 'CarModel', value: 'Mercedes-AMG W13 E Performance' }]
 const mercedesW13ContainerPath = [...mercedesW13Path, 'LedContainers', { field: 'ContainerType', value: 'Groups.CustomConditionalGroup' }, 'LedContainers']
 
-// Open Wheel - Super Formula
-const openWheelSuperFormulaPath = [...openWheelPath, 'LedContainers', { field: 'Description', value: 'Super Formula' }]
-
-// Open Wheel - Various
-const openWheelVariousPath = [...openWheelPath, 'LedContainers', { field: 'Description', value: 'Various' }]
-
 // Miscellaneous
 const carsNotRunningPath = ['LedContainers', { field: 'Description', value: 'ENGINE OFF' }]
 const gameNotRunningPath = ['LedContainers', { field: 'Description', value: 'iRACING NOT RUNNING = OFF' }]
+
+export const paths = {
+    rootPath,
+    leftModulePath,
+    rightModulePath,
+    carsPath,
+
+    // Various
+    variousPath,
+    mx5Path,
+    gr86Path,
+    m2Path,
+
+    // Prototype
+    prototypePath,
+    p499Path,
+    p217Path,
+    vSeriesRPath,
+
+    // Open Wheel
+    openWheelPath,
+    formulaVeePath,
+    formulaFordPath,
+    formula2000Path,
+    f4Path,
+    f3Path,
+    superFormulaLightsPath,
+    superFormulaHondaPath,
+    superFormulaToyotaPath,
+    mercedesW12Path,
+    mercedesW12ContainerPath,
+    mercedesW13Path,
+    mercedesW13ContainerPath,
+
+    carsNotRunningPath,
+    gameNotRunningPath
+}
 
 export const deprecatedPaths = {
     rpmPath: ['LedContainers', { field: 'Description', value: 'RPM' }],
@@ -50,22 +101,4 @@ export const deprecatedPaths = {
     leftModuleFormula1Path: [...leftModulePath, 'LedContainers', { field: 'Description', value: 'Open Wheel' }, 'LedContainers', { field: 'Description', value: 'Formula 1' }],
     leftModuleMercedesW12DrsPath: [...leftModulePath, 'LedContainers', { field: 'Description', value: 'Open Wheel' }, 'LedContainers', { field: 'Description', value: 'Formula 1' }, 'LedContainers', { field: 'CarModel', value: 'Mercedes W12' }, 'LedContainers', { field: 'ContainerType', value: 'Groups.CustomConditionalGroup' }, 'LedContainers', { field: 'Description', value: 'DRS' }],
     leftModuleMercedesW13DrsPath: [...leftModulePath, 'LedContainers', { field: 'Description', value: 'Open Wheel' }, 'LedContainers', { field: 'Description', value: 'Formula 1' }, 'LedContainers', { field: 'CarModel', value: 'Mercedes-AMG W13 E Performance' }, 'LedContainers', { field: 'ContainerType', value: 'Groups.CustomConditionalGroup' }, 'LedContainers', { field: 'Description', value: 'DRS' }]
-}
-
-export const paths = {
-    rootPath,
-    leftModulePath,
-    rightModulePath,
-    carsPath,
-    gt3Path,
-    gt4Path,
-    prototypePath,
-    openWheelPath,
-    fiaF4Path,
-    mercedesW12Path,
-    mercedesW12ContainerPath,
-    mercedesW13Path,
-    mercedesW13ContainerPath,
-    carsNotRunningPath,
-    gameNotRunningPath
 }
