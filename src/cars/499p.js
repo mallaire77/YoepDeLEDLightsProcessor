@@ -459,10 +459,7 @@ export const p499 = (numLeds) => (car) => {
 
     switch (result.ContainerType) {
       case "RPMSegments":
-        console.log({ result })
-        const after = downsizeRPMSegmentsContainer(result, numLeds)
-        console.log({ after })
-        return after
+        return downsizeRPMSegmentsContainer(result, numLeds)
 
       case "CustomStatus":
         if (container.LedCount <= numLeds) {

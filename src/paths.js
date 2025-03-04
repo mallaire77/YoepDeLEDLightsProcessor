@@ -20,7 +20,7 @@ const m2Path = [...variousPath, 'LedContainers', { field: 'CarModel', value: 'BM
 const prototypePath = [...carsPath, 'LedContainers', { field: 'Description', value: 'Prototype' }]
 const p499Path = [...prototypePath, 'LedContainers', { field: 'CarModel', value: 'Ferrari 499P' }]
 const p217Path = [...prototypePath, 'LedContainers', { field: 'CarModel', value: 'Dallara P217 LMP2' }]
-const vSeriesRPath = [...prototypePath, 'LedContainers', { field: 'CarModel', value: 'Cadillac V-Series.R GTP' }]
+const vSeriesRPath = [...prototypePath, 'LedContainers', { field: 'CarModel', value: 'Cadillac V-Series.R' }]
 
 // Open Wheel - Various
 const openWheelPath = [...carsPath, 'LedContainers', { field: 'Description', value: 'Open Wheel' }]

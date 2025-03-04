@@ -44,12 +44,19 @@ const total = options.left + options.middle + options.right
 // Validate original profile
 const reader = createReader(profile)
 for (const path in deprecatedPaths) {
-    reader.exists(deprecatedPaths[path])
+    if (path !== 'movedMiddleFocusedPath' && path !== 'hpdArx01PathEven' && path !== 'hpdArx01PathUneven' && reader.get(deprecatedPaths[path]) === undefined) {
+        console.error(`Error: ${path} not found in original profile`)
+        process.exit(1)
+    }
 }
 
 let profileSpecificPreProcess
 if (isEven) {
-    reader.exists(deprecatedPaths.hpdArx01PathEven)
+    if (reader.get(deprecatedPaths.hpdArx01PathEven) === undefined) {
+        console.error(`Error: ${deprecatedPaths.hpdArx01PathEven} not found in original profile`)
+        process.exit(1)
+    }
+
     // Pre-process original profile (modify structure)
     profileSpecificPreProcess =
         createMutator(profile)
@@ -57,7 +64,11 @@ if (isEven) {
             .delete(deprecatedPaths.rightSideFocusedPath)
             .result()
 } else {
-    reader.exists(deprecatedPaths.hpdArx01PathUneven)
+    if (reader.get(deprecatedPaths.hpdArx01PathUneven) === undefined) {
+        console.error(`Error: ${deprecatedPaths.hpdArx01PathUneven} not found in original profile`)
+        process.exit(1)
+    }
+
     profileSpecificPreProcess =
         createMutator(profile)
             .move(deprecatedPaths.hpdArx01PathUneven, deprecatedPaths.middleFocusedPrototypePath)
@@ -90,7 +101,10 @@ const preProcessedProfile =
 // Validate pre-processed profile
 const preProcessedReader = createReader(preProcessedProfile)
 for (const path in paths) {
-    preProcessedReader.exists(paths[path])
+    if (preProcessedReader.get(paths[path]) === undefined) {
+        console.error(`Error: ${path} not found in pre-processed profile`)
+        process.exit(1)
+    }
 }
 
 if (options.preprocess) {
