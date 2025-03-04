@@ -68,6 +68,7 @@ if (isEven) {
             .result()
 }
 
+const profileName = options.wheel ? `${options.version} Yoep de LEDLights ${options.wheel} v2` : `${options.version} Yoep de LEDLights ${left}-${middle}-${right} v2`
 const preProcessedProfile =
     createMutator(profileSpecificPreProcess)
         // Macro Re-structure
@@ -78,7 +79,7 @@ const preProcessedProfile =
         }))
         .mutate([], container => ({
             ...container,
-            Name: `${container.Name.substring(0, container.Name.indexOf("LEDLights") + "LEDLights".length)} ${left}-${middle}-${right} v2`,
+            Name: profileName,
             ProfileId: crypto.randomUUID()
         }))
         // Micro Re-structure
@@ -176,7 +177,8 @@ if (options.preprocess) {
         fs.mkdirSync('./outputs', { recursive: true })
     }
 
-    const outputFile = `./outputs/${left}-${middle}-${right}.ledsprofile`
+    const fileName = options.wheel ? `${options.wheel}.ledsprofile` : `${left}-${middle}-${right}.ledsprofile`
+    const outputFile = `./outputs/${fileName}`
     fs.writeFileSync(outputFile, JSON.stringify(updatedProfile, null, 2), 'utf8')
     console.log(`Profile saved to ${outputFile}!`)
     process.exit(0)
