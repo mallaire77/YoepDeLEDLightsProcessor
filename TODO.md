@@ -11,11 +11,11 @@ Dallara P217 ✓
 Cadillac V-Series.R GTP ✓
 
 GT3
-Ferrari 296 GT3
-BMW M4 GT3
-Porsche 911 GT3 R (992)
-Mercedes-AMG GT3 2020
-McLaren 720S GT3 EVO
+Ferrari 296 GT3 ✓
+BMW M4 GT3 ✓
+Porsche 911 GT3 R (992) ✓
+Mercedes-AMG GT3 2020 ✓
+McLaren 720S GT3 EVO ✓
 
 Open Wheel
 Formula Vee ✓
