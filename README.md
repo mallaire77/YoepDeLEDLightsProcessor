@@ -31,7 +31,7 @@ node --experimental-vm-modules node_modules/jest/bin/jest.js
 | Wheel | Description | Key |
 |-----------|-------------|-------------|
 | Leoxz XGT Pro (*RPM Lights*) | This will generate the profile for the RPM led segments | *leoxz_xgt_pro_rpm* |
-| Leoxz XGT Pro (*Left & Right Modules*) | This will generate the profile for the left & right modules, this profile is meant to be applied to the button leds | *leoxz_xgt_pro_lr_modules*
+| Leoxz XGT Pro (*Buttons*) | This will generate the profile for the left & right modules applied to the left and right most button clusters | *leoxz_xgt_pro_buttons*
 
 ## Example
 ```

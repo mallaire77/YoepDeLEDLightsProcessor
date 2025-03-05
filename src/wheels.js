@@ -4,7 +4,7 @@ export default {
         middle: 9,
         right: 0,
     },
-    leoxz_xgt_pro_lr_modules: {
+    leoxz_xgt_pro_buttons: {
         left: 3,
         middle: 0,
         right: 3,
