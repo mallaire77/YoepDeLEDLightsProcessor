@@ -10,7 +10,7 @@ import { deprecatedPaths, paths } from './paths.js'
 import gt3296 from './cars/296_gt3.js'
 
 // Open Wheel
-import mercedesW12 from './cars/mercedes_w12.js'
+import mercedesF1 from './cars/mercedes_f1.js'
 
 const profilesDir = './profiles'
 if (!fs.existsSync(profilesDir)) {
@@ -22,7 +22,7 @@ if (!fs.existsSync(profilesDir)) {
 // Scaffold
 const options = args()
 const settings = options.wheel ? wheels[options.wheel] : options.settings
-const isEven = options.middle % 2 === 0
+const isEven = settings.middle % 2 === 0
 const configuration = isEven ? '3_16_3' : '3_15_3'
 const profile = JSON.parse(fs.readFileSync(`./profiles/${options.version}_Yoep_de_LEDLights_${configuration}.ledsprofile`, 'utf8'))
 const left = settings.left
@@ -159,7 +159,7 @@ if (options.preprocess) {
             .mutate(paths.vSeriesRPath, downsizeCar(middle))
             .mutate(paths.gt3M4Path, downsizeCar(middle))
             .mutate(paths.gt3296Path, gt3296(middle))
-            .mutate(paths.gt3720sPath, downsizeCar(middle, true))
+            .mutate(paths.gt3720sPath, downsizeCar(middle))
             .mutate(paths.gt3911RPath, downsizeCar(middle))
             .mutate(paths.gt3Amg2020Path, downsizeCar(middle))
             .mutate(paths.formulaVeePath, downsizeCar(middle))
@@ -170,7 +170,8 @@ if (options.preprocess) {
             .mutate(paths.superFormulaLightsPath, downsizeCar(middle))
             .mutate(paths.superFormulaHondaPath, downsizeCar(middle))
             .mutate(paths.superFormulaToyotaPath, downsizeCar(middle))
-            .mutate(paths.mercedesW12Path, mercedesW12(middle))
+            .mutate(paths.mercedesW12Path, mercedesF1(middle))
+            .mutate(paths.mercedesW13Path, mercedesF1(middle))
             .result()
 
     if (!fs.existsSync('./outputs')) {

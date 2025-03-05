@@ -554,6 +554,7 @@ export default (numLeds) => (car) => {
 
       case "CustomStatus":
       case "StaticColor":
+      case "Status.SpeedLimiter":
         if (
           result.EnabledFormula && result.EnabledFormula.Expression === "isnull([GameRawData.Telemetry.OilPress],0)<1.6" ||
           result.EnabledFormula && result.EnabledFormula.Expression === "if(isnull([DataCorePlugin.Computed.Fuel_Percent],0)<0.75961538,\r\n\r\nif(isnull([YoepGt.HideFuelWarning],0)=true,false,true)\r\n\r\n,false)"

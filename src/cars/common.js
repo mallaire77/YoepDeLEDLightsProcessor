@@ -21,6 +21,7 @@ export const downsizeCar = (numLeds, debug = false) => (car) => {
 
       case "CustomStatus":
       case "StaticColor":
+      case "Status.SpeedLimiter":
       case "Status.SpeedLimiterAnimation":
         if (parseInt(container.LedCount, 10) <= numLeds) {
           return {
@@ -45,142 +46,139 @@ export const downsizeCar = (numLeds, debug = false) => (car) => {
 }
 
 export const downsizeRPMSegmentsContainer = (segmentContainer, targetNumLeds, startPosition = 1, debug = false) => {
-  const countSegmentLeds = (segments) => {
+  const deserialize = (segments) => {
     return segments.reduce((acc, segment) => {
-      const parts = segment.split(';')
-      return acc + parseInt(parts[0], 10)
-    }, 0)
+      const [count, position, color, hasTrail, trailColor] = segment.split(';')
+      for (let i = 0; i < count; i++) {
+        acc.push({ count: 1, position: parseFloat(position), color, hasTrail, trailColor })
+      }
+      return acc
+    }, [])
   }
 
-  const downsizeSegmentLeds = (segments, targetLedCount) => {
-    const deserialize = (segments) => {
-      return segments.reduce((acc, segment) => {
-        const [count, position, color, hasTrail, trailColor] = segment.split(';')
-        for (let i = 0; i < count; i++) {
-          acc.push({ count: 1, position: parseFloat(position), color, hasTrail, trailColor })
+  const serialize = (segments) => {
+    return segments.map(segment => `${segment.count};${segment.position};${segment.color};${segment.hasTrail};${segment.trailColor}`)
+  }
+
+  const downsize = (segments, targetNumLeds) => {
+    if (targetNumLeds === 1) {
+      const result = segments.sort((a, b) => b.position - a.position).slice(0, 1)
+      return result
+    } else {
+      const colorGroups = segments.reduce((groups, segment) => {
+        if (!groups[segment.color]) {
+          groups[segment.color] = []
         }
-        return acc
-      }, [])
-    }
+        groups[segment.color].push(segment)
+        return groups
+      }, {})
 
-    const serialize = (segments) => {
-      return segments.map(segment => `${segment.count};${segment.position};${segment.color};${segment.hasTrail};${segment.trailColor}`)
-    }
+      const sortedColorGroup =
+        Object
+          .keys(colorGroups)
+          .map((color) => {
+            const colorGroup = colorGroups[color]
+            const sortedColorGroup = colorGroup.sort((a, b) => b.position - a.position)
+            return sortedColorGroup
+          })
+          .sort((a, b) => b[0].position - a[0].position)
 
-    const downsize = (segments, targetLedCount) => {
-      if (targetLedCount === 1) {
-        const result = segments.sort((a, b) => b.position - a.position).slice(0, 1)
-        return result
-      } else {
-        const colorGroups = segments.reduce((groups, segment) => {
-          if (!groups[segment.color]) {
-            groups[segment.color] = []
+      const colors =
+        sortedColorGroup.reduce((acc, colorGroup) => {
+          const proportionalCount = Math.round((Math.round(((colorGroup.length / segments.length) * 100)) / 100) * targetNumLeds)
+          return {
+            ...acc,
+            [colorGroup[0].color]: {
+              count: 0,
+              proportionalCount
+            }
           }
-          groups[segment.color].push(segment)
-          return groups
         }, {})
 
-        const sortedColorGroup =
-          Object
-            .keys(colorGroups)
-            .map((color) => {
-              const colorGroup = colorGroups[color]
-              const sortedColorGroup = colorGroup.sort((a, b) => b.position - a.position)
-              return sortedColorGroup
-            })
-            .sort((a, b) => b[0].position - a[0].position)
-
-        const colors =
-          sortedColorGroup.reduce((acc, colorGroup) => {
-            const proportionalCount = Math.round((Math.round(((colorGroup.length / segments.length) * 100)) / 100) * targetLedCount)
-            return {
-              ...acc,
-              [colorGroup[0].color]: {
-                count: 0,
-                proportionalCount
-              }
-            }
-          }, {})
-
-        if (Object.values(colors).reduce((acc, color) => acc + color.proportionalCount, 0) < targetLedCount) {
-          colors[sortedColorGroup[0][0].color].proportionalCount++
-        }
-
-        const result = []
-        let i = 0
-        while (i < targetLedCount) {
-          let j = 0
-          while (j < sortedColorGroup.length && i < targetLedCount) {
-            // Skip empty arrays
-            if (sortedColorGroup[j].length === 0) {
-              j++
-              continue
-            }
-
-            // Peek at the segment without removing it yet
-            const segment = sortedColorGroup[j][0]
-
-            if ((i === 0 && j === 0) || (colors[segment.color].count < colors[segment.color].proportionalCount)) {
-              // Only remove the segment if we're going to use it
-              sortedColorGroup[j].shift()
-              colors[segment.color].count = colors[segment.color].count + 1
-              result.push(segment)
-              i++
-            }
-            j++
-          }
-        }
-
-        let sortedResult
-        if (segments[0].position < segments[segments.length - 1].position) {
-          sortedResult = result.sort((a, b) => a.position - b.position)
-        } else {
-          sortedResult = result.sort((a, b) => b.position - a.position)
-        }
-        return sortedResult
+      if (Object.values(colors).reduce((acc, color) => acc + color.proportionalCount, 0) < targetNumLeds) {
+        colors[sortedColorGroup[0][0].color].proportionalCount++
       }
-    }
 
-    const parsedSegments = deserialize(segments)
-    if (targetLedCount === 0) {
+      const result = []
+      let i = 0
+      while (i < targetNumLeds) {
+        let j = 0
+        while (j < sortedColorGroup.length && i < targetNumLeds) {
+          // Skip empty arrays
+          if (sortedColorGroup[j].length === 0) {
+            j++
+            continue
+          }
 
-    } else if (parsedSegments[0].position === parsedSegments[parsedSegments.length - 1].position && parsedSegments.length % 2 === 0) {
-      // Middle based, even number of segments
-      const leftHalf = downsize(parsedSegments.slice(0, parsedSegments.length / 2), targetLedCount / 2)
-      const result = [...leftHalf, ...leftHalf.reverse()]
-      return serialize(result)
-    } else if (parsedSegments[0].position === parsedSegments[parsedSegments.length - 1].position) {
-      // Middle based, uneven number of segments
-      const midpoint = Math.floor(parsedSegments.length / 2)
-      const leftHalf = downsize(parsedSegments.slice(0, midpoint), Math.floor(targetLedCount / 2))
-      const result = [...leftHalf, parsedSegments[midpoint], ...leftHalf.reverse()]
-      return serialize(result)
-    } else {
-      // Left to right based
-      const result = downsize(parsedSegments, targetLedCount)
-      return serialize(result)
+          // Peek at the segment without removing it yet
+          const segment = sortedColorGroup[j][0]
+
+          if ((i === 0 && j === 0) || (colors[segment.color].count < colors[segment.color].proportionalCount)) {
+            // Only remove the segment if we're going to use it
+            sortedColorGroup[j].shift()
+            colors[segment.color].count = colors[segment.color].count + 1
+            result.push(segment)
+            i++
+          }
+          j++
+        }
+      }
+
+      let sortedResult
+      if (segments[0].position < segments[segments.length - 1].position) {
+        sortedResult = result.sort((a, b) => a.position - b.position)
+      } else {
+        sortedResult = result.sort((a, b) => b.position - a.position)
+      }
+      return sortedResult
     }
   }
 
-  const numLeds = countSegmentLeds(segmentContainer.Segments)
+  
+  const parsedSegments = deserialize(segmentContainer.Segments)
+  const numLeds = parsedSegments.length
   if (targetNumLeds === 0) {
     return {
       ...segmentContainer,
+      StartPosition: startPosition,
       Segments: [],
-      SegmentsCount: 0
+      SegmentsCount: 0,
     }
   } else if (numLeds <= targetNumLeds) {
     return {
       ...segmentContainer,
       StartPosition: startPosition + Math.round((targetNumLeds - numLeds) / 2),
     }
-  } else {
-    const downsizedSegments = downsizeSegmentLeds(segmentContainer.Segments, targetNumLeds, debug)
+  } else if (parsedSegments[0].position === parsedSegments[parsedSegments.length - 1].position && parsedSegments.length % 2 === 0) {
+    const leftHalf = downsize(parsedSegments.slice(0, parsedSegments.length / 2), targetNumLeds / 2)
+    const result = [...leftHalf, ...leftHalf.reverse()]
+    const serializedResult = serialize(result)
     return {
       ...segmentContainer,
       StartPosition: startPosition,
-      Segments: downsizedSegments,
-      SegmentsCount: downsizedSegments.length
+      Segments: serializedResult,
+      SegmentsCount: serializedResult.length
+    }
+  } else if (parsedSegments[0].position === parsedSegments[parsedSegments.length - 1].position) {
+    const midpoint = Math.floor(parsedSegments.length / 2)
+    const leftHalf = downsize(parsedSegments.slice(0, midpoint), Math.floor(targetNumLeds / 2))
+    const result = [...leftHalf, parsedSegments[midpoint + 1], ...leftHalf.reverse()]
+    const serializedResult = serialize(result)
+    return {
+      ...segmentContainer,
+      StartPosition: startPosition,
+      Segments: serializedResult,
+      SegmentsCount: serializedResult.length
+    }
+  } else {
+    // Left to right based
+    const result = downsize(parsedSegments, targetNumLeds)
+    const serializedResult = serialize(result)
+    return {
+      ...segmentContainer,
+      StartPosition: startPosition,
+      Segments: serializedResult,
+      SegmentsCount: serializedResult.length
     }
   }
 }
@@ -241,26 +239,53 @@ export const downsizeAnimationContainer = (animationContainer, targetNumLeds, st
   }
 
   const downsize = (frame, numLeds, targetNumLeds) => {
-    const slice = Math.round((numLeds - targetNumLeds) / 2)
-    const min = 0 + slice
-    const max = numLeds - 1 - slice
+    const adjustedNumLeds = numLeds % 2 === targetNumLeds % 2 ? numLeds : numLeds - 1
+    const slice = Math.round((adjustedNumLeds - targetNumLeds) / 2)
+    
+    // Check if we have LEDs at start and end positions
+    const hasStartLed = frame.Colors.length > 0 && frame.Colors[0].color !== '#000000'
+    const hasEndLed = frame.Colors.length > 0 && frame.Colors[frame.Colors.length - 1].color !== '#000000'
+    
+    let min, max
+    if (hasStartLed && !hasEndLed) {
+      min = 0
+      max = adjustedNumLeds - 1 - (slice * 2)
+    } else if (!hasStartLed && hasEndLed) {
+      min = slice * 2 
+      max = adjustedNumLeds - 1
+    } else {
+      min = slice
+      max = adjustedNumLeds - 1 - slice
+    }
+
+    // console.log({
+    //   hasStartLed,
+    //   hasEndLed,
+    //   min,
+    //   max,
+    //   numLeds,
+    //   adjustedNumLeds,
+    //   targetNumLeds,
+    //   slice,
+    //   colors: frame.Colors
+    // })
 
     return {
-      ...frame,
-      Colors:
-        frame.Colors
-          .filter(color => {
-            return color.position >= min && color.position <= max
-          })
-          .map(color => {
-            return {
-              ...color,
-              position: color.position - slice,
-            }
-          })
-          .sort((a, b) => {
-            return a.position - b.position
-          })
+        ...frame,
+        Colors:
+            frame.Colors
+                .filter(color => {
+                    return color.position >= min && color.position <= max
+                })
+                .map(color => {
+                    return {
+                        ...color,
+                        position: color.position - slice,
+                    }
+                })
+                .sort((a, b) => {
+                    return a.position - b.position
+                })
     }
   }
 
@@ -278,13 +303,23 @@ export const downsizeAnimationContainer = (animationContainer, targetNumLeds, st
           .slice(0, Math.floor(frame.Colors.length / 2))
           .every((color, colorIdx) => color.color.toLowerCase() === frame.Colors[frame.Colors.length - 1 - colorIdx].color.toLowerCase())
 
+        console.log({
+          isSymmetric,
+          numLeds,
+          targetNumLeds,
+          colors: frame.Colors
+        })
+
         if (targetNumLeds === 0) {
           return []
         } else if (isSymmetric && numLeds % 2 === 0) {
+          const half = frame.Colors.slice(0, numLeds / 2)
+
           const downsizedFrame = downsize({
             ...frame,
-            Colors: frame.Colors.slice(0, numLeds / 2)
+            Colors: half
           }, numLeds / 2, targetNumLeds / 2)
+
           const downsizedColors =
             [...downsizedFrame.Colors, ...downsizedFrame.Colors.reverse()].map((color, idx) => ({
               ...color,
@@ -297,12 +332,15 @@ export const downsizeAnimationContainer = (animationContainer, targetNumLeds, st
           })
         } else if (isSymmetric) {
           const midpoint = Math.floor(frame.Colors.length / 2)
+          const half = frame.Colors.slice(0, midpoint)
+
           const downsizedFrame = downsize({
             ...frame,
-            Colors: frame.Colors.slice(0, midpoint)
+            Colors: half
           }, Math.round(numLeds / 2), Math.floor(targetNumLeds / 2))
+
           const downsizedColors =
-            [...downsizedFrame.Colors, frame.Colors[midpoint], ...downsizedFrame.Colors.reverse()].map((color, idx) => ({
+            [...downsizedFrame.Colors, frame.Colors[midpoint + 1], ...downsizedFrame.Colors.reverse()].map((color, idx) => ({
               ...color,
               position: idx
             }))

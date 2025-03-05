@@ -35,3 +35,6 @@ Cadillac CTS-V Racecar
 
 GT4
 Mercedes-AMG GT4
+
+Miscellaneous
+Add Ferrari 296 GT3 pit limiter to left & right modules

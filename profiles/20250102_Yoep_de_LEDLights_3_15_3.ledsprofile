@@ -3413,7 +3413,7 @@
                                     "Rows": 1,
                                     "Frames": [
                                       {
-                                        "Colors": "0,5,#FFFF00;0,4,#FFFF00;0,6,Yellow",
+                                        "Colors": "0,5,#FFFF00;0,4,#FFFF00;0,6,#FFFF00",
                                         "FrameDuration": 100
                                       }
                                     ],
@@ -3438,7 +3438,7 @@
                                     "Rows": 1,
                                     "Frames": [
                                       {
-                                        "Colors": "0,7,#FFFF00;0,3,#FFFF00;0,2,#FFFF00;0,8,Yellow",
+                                        "Colors": "0,7,#FFFF00;0,3,#FFFF00;0,2,#FFFF00;0,8,#FFFF00",
                                         "FrameDuration": 100
                                       }
                                     ],
