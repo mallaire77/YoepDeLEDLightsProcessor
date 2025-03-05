@@ -563,11 +563,11 @@ export default (numLeds) => (car) => {
             StartPosition: 1,
             LedCount: Math.min(numLeds, 2)
           }
-        } else if (container.LedCount <= numLeds) {
+        } else if (parseInt(container.LedCount, 10) <= numLeds) {
           return {
             ...result,
-            StartPosition: Math.round((numLeds - container.LedCount) / 2),
-            LedCount: numLeds
+            StartPosition: 1 + Math.round((numLeds - parseInt(container.LedCount, 10)) / 2),
+            LedCount: parseInt(container.LedCount, 10)
           }
         } else {
           return {

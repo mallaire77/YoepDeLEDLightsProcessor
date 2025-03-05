@@ -22,12 +22,11 @@ export const downsizeCar = (numLeds, debug = false) => (car) => {
       case "CustomStatus":
       case "StaticColor":
       case "Status.SpeedLimiterAnimation":
-        if (container.LedCount <= numLeds) {
+        if (parseInt(container.LedCount, 10) <= numLeds) {
           return {
             ...result,
-            ...result,
-            StartPosition: Math.round((numLeds - container.LedCount) / 2),
-            LedCount: numLeds
+            StartPosition: 1 + Math.round((numLeds - parseInt(container.LedCount, 10)) / 2),
+            LedCount: parseInt(container.LedCount, 10)
           }
         } else {
           return {
@@ -45,47 +44,27 @@ export const downsizeCar = (numLeds, debug = false) => (car) => {
   return processContainers(car)
 }
 
-export const countSegmentLeds = (segments) => {
-  return segments.reduce((acc, segment) => {
-    const parts = segment.split(';')
-    return acc + parseInt(parts[0], 10)
-  }, 0)
-}
-
-export const countFramesLeds = (frames) => {
-  let highestPosition = 0
-  for (const frame of frames) {
-    for (const color of frame.Colors.split(';')) {
-      const parts = color.split(',')
-      const position = parseInt(parts[1], 10)
-      if (position > highestPosition) {
-        highestPosition = position
-      }
-    }
-  }
-  return highestPosition + 1
-}
-
 export const downsizeRPMSegmentsContainer = (segmentContainer, targetNumLeds, startPosition = 1, debug = false) => {
-  const downsizeSegmentLeds = (segments, targetLedCount) => {
-    if (debug) console.log('downsizeSegmentLeds input:', segments, 'targetLedCount:', targetLedCount)
+  const countSegmentLeds = (segments) => {
+    return segments.reduce((acc, segment) => {
+      const parts = segment.split(';')
+      return acc + parseInt(parts[0], 10)
+    }, 0)
+  }
 
+  const downsizeSegmentLeds = (segments, targetLedCount) => {
     const deserialize = (segments) => {
-      const result = segments.reduce((acc, segment) => {
+      return segments.reduce((acc, segment) => {
         const [count, position, color, hasTrail, trailColor] = segment.split(';')
         for (let i = 0; i < count; i++) {
           acc.push({ count: 1, position: parseFloat(position), color, hasTrail, trailColor })
         }
         return acc
       }, [])
-      if (debug) console.log('deserialize result:', result)
-      return result
     }
 
     const serialize = (segments) => {
-      const result = segments.map(segment => `${segment.count};${segment.position};${segment.color};${segment.hasTrail};${segment.trailColor}`)
-      if (debug) console.log('serialize result:', result)
-      return result
+      return segments.map(segment => `${segment.count};${segment.position};${segment.color};${segment.hasTrail};${segment.trailColor}`)
     }
 
     const downsize = (segments, targetLedCount) => {
@@ -100,7 +79,6 @@ export const downsizeRPMSegmentsContainer = (segmentContainer, targetNumLeds, st
           groups[segment.color].push(segment)
           return groups
         }, {})
-        if (debug) console.log('colorGroups:', colorGroups)
 
         const sortedColorGroup =
           Object
@@ -111,7 +89,6 @@ export const downsizeRPMSegmentsContainer = (segmentContainer, targetNumLeds, st
               return sortedColorGroup
             })
             .sort((a, b) => b[0].position - a[0].position)
-        if (debug) console.log('sortedColorGroup:', sortedColorGroup)
 
         const colors =
           sortedColorGroup.reduce((acc, colorGroup) => {
@@ -129,14 +106,6 @@ export const downsizeRPMSegmentsContainer = (segmentContainer, targetNumLeds, st
           colors[sortedColorGroup[0][0].color].proportionalCount++
         }
 
-        if (debug) {
-          console.log('colors:', colors)
-          console.log('targetLedCount:', targetLedCount)
-          console.log('segments:', segments)
-          console.log('sortedColorGroup:', sortedColorGroup)
-          console.log(Object.values(colors).reduce((acc, color) => acc + color.proportionalCount, 0))
-        }
-
         const result = []
         let i = 0
         while (i < targetLedCount) {
@@ -150,11 +119,6 @@ export const downsizeRPMSegmentsContainer = (segmentContainer, targetNumLeds, st
 
             // Peek at the segment without removing it yet
             const segment = sortedColorGroup[j][0]
-
-            // if (debug) {
-            //   console.log(`i: ${i}, j: ${j}, segment: ${segment.color}, count: ${colors[segment.color].count}, proportionalCount: ${colors[segment.color].proportionalCount}`)
-            //   console.log({ result })
-            // }
 
             if ((i === 0 && j === 0) || (colors[segment.color].count < colors[segment.color].proportionalCount)) {
               // Only remove the segment if we're going to use it
@@ -178,35 +142,22 @@ export const downsizeRPMSegmentsContainer = (segmentContainer, targetNumLeds, st
     }
 
     const parsedSegments = deserialize(segments)
+    if (targetLedCount === 0) {
 
-    if (debug) {
-      console.log('parsedSegments first position:', parsedSegments[0]?.position)
-      console.log('parsedSegments last position:', parsedSegments[parsedSegments.length - 1]?.position)
-      console.log('parsedSegments length:', parsedSegments.length, 'is even:', parsedSegments.length % 2 === 0)
-      console.log('targetLedCount:', targetLedCount, 'is even:', targetLedCount % 2 === 0)
-    }
-
-    if (parsedSegments[0].position === parsedSegments[parsedSegments.length - 1].position && parsedSegments.length % 2 === 0 && targetLedCount % 2 === 0) {
+    } else if (parsedSegments[0].position === parsedSegments[parsedSegments.length - 1].position && parsedSegments.length % 2 === 0) {
       // Middle based, even number of segments
-      if (debug) console.log('Using middle-based even strategy')
       const leftHalf = downsize(parsedSegments.slice(0, parsedSegments.length / 2), targetLedCount / 2)
       const result = [...leftHalf, ...leftHalf.reverse()]
-      if (debug) console.log('Final result (middle-based even):', result)
       return serialize(result)
-    } else if (parsedSegments[0].position === parsedSegments[parsedSegments.length - 1].position && parsedSegments.length % 2 !== 0 && targetLedCount % 2 !== 0) {
+    } else if (parsedSegments[0].position === parsedSegments[parsedSegments.length - 1].position) {
       // Middle based, uneven number of segments
-      if (debug) console.log('Using middle-based uneven strategy')
       const midpoint = Math.floor(parsedSegments.length / 2)
-      if (debug) console.log('Midpoint:', midpoint, 'Middle segment:', parsedSegments[midpoint])
       const leftHalf = downsize(parsedSegments.slice(0, midpoint), Math.floor(targetLedCount / 2))
       const result = [...leftHalf, parsedSegments[midpoint], ...leftHalf.reverse()]
-      if (debug) console.log('Final result (middle-based uneven):', result)
       return serialize(result)
     } else {
       // Left to right based
-      if (debug) console.log('Using left-to-right strategy')
       const result = downsize(parsedSegments, targetLedCount)
-      if (debug) console.log('Final result (left-to-right):', result)
       return serialize(result)
     }
   }
@@ -235,85 +186,135 @@ export const downsizeRPMSegmentsContainer = (segmentContainer, targetNumLeds, st
 }
 
 export const downsizeAnimationContainer = (animationContainer, targetNumLeds, startPosition = 1, debug = false) => {
-  const downsizeFrames = (frames, targetNumLeds) => {
-    const deserialize = (frames) => {
-      return frames.map(frame => {
-        return {
-          ...frame,
-          Colors: frame.Colors.split(';').map(_color => {
-            const [unknown, position, color] = _color.split(',')
-            return {
-              unknown,
-              position: parseInt(position, 10),
-              color
-            }
+  const deserialize = (frames, numLeds) => {
+    return frames.map(frame => {
+      const convertedColors = frame.Colors
+        .split(';')
+        .map(_color => {
+          const [unknown, position, color] = _color.split(',')
+          return {
+            unknown,
+            position: parseInt(position, 10),
+            color
+          }
+        })
+        .sort((a, b) => a.position - b.position)
+
+      let filledOutColors = []
+      let i = 0
+      let colorIndex = 0
+      while (i < numLeds) {
+        const color = convertedColors[colorIndex]
+        if (color === undefined) {
+          filledOutColors.push({
+            unknown: '0',
+            position: i,
+            color: '#000000'
           })
+          i++
+        } else if (color.position !== i) {
+          filledOutColors.push({
+            unknown: '0',
+            position: i,
+            color: '#000000'
+          })
+          i++
+        } else {
+          filledOutColors.push(color)
+          i++
+          colorIndex++
         }
-      })
-    }
+      }
 
-    const serialize = (frames) => {
-      return frames.map(frame => ({
-        ...frame,
-        Colors: frame.Colors.map(color => `${color.unknown},${color.position},${color.color}`).join(';')
-      }))
-    }
-
-    const parsedFrames = deserialize(frames)
-    const numLeds = countFramesLeds(frames)
-    const slice = numLeds <= targetNumLeds ? 0 : Math.round((numLeds - targetNumLeds) / 2)
-    const min = slice
-    const max = (targetNumLeds - 1) - slice
-
-    if (debug) {
-      console.log({ numLeds, targetNumLeds, slice, min, max })
-    }
-
-    return serialize(parsedFrames.map((frame) => {
       return {
         ...frame,
-        Colors:
-          frame.Colors
-            .filter(color => {
-              return numLeds <= targetNumLeds || color.position >= min && color.position <= max
-            })
-            .map(color => {
-              return {
-                ...color,
-                position: color.position - slice,
-              }
-            })
-            .sort((a, b) => {
-              return a.position - b.position
-            })
+        Colors: filledOutColors
       }
-    }))
+    })
   }
 
-  const numLeds = countFramesLeds(animationContainer.Animation.Frames)
-  if (targetNumLeds === 0) {
+  const serialize = (frame) => {
     return {
-      ...animationContainer,
-      StartPosition: startPosition,
-      Animation: {
-        ...animationContainer.Animation,
-        StartPosition: 1,
-        Columns: 0,
-        Frames: []
-      }
+      ...frame,
+      Colors: frame.Colors.map(color => `${color.unknown},${color.position},${color.color}`).join(';')
     }
-  } else {
-    const downsizedFrames = downsizeFrames(animationContainer.Animation.Frames, targetNumLeds, debug)
+  }
+
+  const downsize = (frame, numLeds, targetNumLeds) => {
+    const slice = Math.round((numLeds - targetNumLeds) / 2)
+    const min = 0 + slice
+    const max = numLeds - 1 - slice
+
     return {
-      ...animationContainer,
-      // StartPosition: numLeds <= targetNumLeds ? startPosition + Math.round((targetNumLeds - numLeds) / 2) : startPosition,
+      ...frame,
+      Colors:
+        frame.Colors
+          .filter(color => {
+            return color.position >= min && color.position <= max
+          })
+          .map(color => {
+            return {
+              ...color,
+              position: color.position - slice,
+            }
+          })
+          .sort((a, b) => {
+            return a.position - b.position
+          })
+    }
+  }
+
+  const numLeds = parseInt(animationContainer.Animation.Columns, 10)
+  const parsedFrames = deserialize(animationContainer.Animation.Frames, numLeds)
+  return {
+    ...animationContainer,
+    StartPosition: startPosition,
+    Animation: {
+      ...animationContainer.Animation,
       StartPosition: 1,
-      Animation: {
-        ...animationContainer.Animation,
-        StartPostion: 1,
-        Columns: countFramesLeds(downsizedFrames),
-        Frames: downsizedFrames
-      }
+      Columns: targetNumLeds,
+      Frames: parsedFrames.map(frame => {
+        const isSymmetric = frame.Colors
+          .slice(0, Math.floor(frame.Colors.length / 2))
+          .every((color, colorIdx) => color.color.toLowerCase() === frame.Colors[frame.Colors.length - 1 - colorIdx].color.toLowerCase())
+
+        if (targetNumLeds === 0) {
+          return []
+        } else if (isSymmetric && numLeds % 2 === 0) {
+          const downsizedFrame = downsize({
+            ...frame,
+            Colors: frame.Colors.slice(0, numLeds / 2)
+          }, numLeds / 2, targetNumLeds / 2)
+          const downsizedColors =
+            [...downsizedFrame.Colors, ...downsizedFrame.Colors.reverse()].map((color, idx) => ({
+              ...color,
+              position: idx
+            }))
+
+          return serialize({
+            ...downsizedFrame,
+            Colors: downsizedColors
+          })
+        } else if (isSymmetric) {
+          const midpoint = Math.floor(frame.Colors.length / 2)
+          const downsizedFrame = downsize({
+            ...frame,
+            Colors: frame.Colors.slice(0, midpoint)
+          }, Math.round(numLeds / 2), Math.floor(targetNumLeds / 2))
+          const downsizedColors =
+            [...downsizedFrame.Colors, frame.Colors[midpoint], ...downsizedFrame.Colors.reverse()].map((color, idx) => ({
+              ...color,
+              position: idx
+            }))
+
+          return serialize({
+            ...downsizedFrame,
+            Colors: downsizedColors
+          })
+        } else {
+          return serialize(downsize(frame, numLeds, targetNumLeds))
+        }
+      })
     }
   }
 }
