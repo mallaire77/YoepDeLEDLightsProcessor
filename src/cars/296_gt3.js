@@ -1,4 +1,4 @@
-import { downsizeRPMSegmentsContainer, downsizeAnimationContainer } from './common.js'
+import { downsizeRPMSegmentsContainer, downsizeAnimationContainer } from '../common.js'
 
 // {
 //   "CarModel": "Ferrari 296 GT3",

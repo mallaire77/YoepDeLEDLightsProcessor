@@ -16,7 +16,7 @@ export default {
         customLeftStart: 16,
         customMiddleStart: undefined,
         customRightStart: 1,
-        reverseLeftModule: undefined,
+        reverseLeftModule: true,
         reverseRightModule: undefined,
     }
 }

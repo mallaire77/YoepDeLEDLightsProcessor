@@ -3,6 +3,7 @@ import crypto from 'crypto'
 import args from './args.js'
 import wheels from './wheels.js'
 import { downsizeCar } from './cars/common.js'
+import { downsizeModule } from './modules/common.js'
 import { createMutator, createReader } from './common.js'
 import { deprecatedPaths, paths } from './paths.js'
 
@@ -151,6 +152,8 @@ if (options.preprocess) {
                     LedCount: total
                 }))
             }))
+            .mutate(paths.leftModulePath, (module) => left > 0 ? downsizeModule(left, settings.reverseLeftModule)(module) : module)
+            .mutate(paths.rightModulePath, (module) => right > 0 ? downsizeModule(right, settings.reverseRightModule)(module) : module)
             .mutate(paths.mx5Path, downsizeCar(middle))
             .mutate(paths.gr86Path, downsizeCar(middle))
             .mutate(paths.m2Path, downsizeCar(middle))
