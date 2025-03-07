@@ -8,6 +8,8 @@ export default () => {
             left: 3,
             middle: 16,
             right: 3,
+            leds: undefined,
+            brightness: undefined,
             customLeftStart: undefined,
             customMiddleStart: undefined,
             customRightStart: undefined,
@@ -35,6 +37,16 @@ export default () => {
 
                 case '--right':
                     options.settings.right = parseInt(args[i + 1], 10)
+                    i++
+                    break
+
+                case '--leds':
+                    options.settings.leds = parseInt(args[i + 1], 10)
+                    i++
+                    break
+
+                case '--brightness':
+                    options.settings.brightness = parseInt(args[i + 1], 10)
                     i++
                     break
 

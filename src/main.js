@@ -23,16 +23,25 @@ if (!fs.existsSync(profilesDir)) {
 // Scaffold
 const options = args()
 const settings = options.wheel ? wheels[options.wheel] : options.settings
+
+if (!settings) {
+    console.error(`Settings are undefined!`)
+    process.exit(1)
+}
+
 const isEven = settings.middle % 2 === 0
 const configuration = isEven ? '3_16_3' : '3_15_3'
 const profile = JSON.parse(fs.readFileSync(`./profiles/${options.version}_Yoep_de_LEDLights_${configuration}.ledsprofile`, 'utf8'))
+const brightness = settings.brightness
 const left = settings.left
 const middle = settings.middle
 const right = settings.right
+const leds = settings.leds ? settings.leds : left + middle + right
 const leftStartPosition = settings.customLeftStart ? settings.customLeftStart : 1
 const middleStartPosition = settings.customMiddleStart ? settings.customMiddleStart : left + 1
 const rightStartPosition = settings.customRightStart ? settings.customRightStart : middleStartPosition + 1
-const total = left + middle + right
+const reverseLeftModule = settings.reverseLeftModule
+const reverseRightModule = settings.reverseRightModule
 
 // Validate original profile
 const reader = createReader(profile)
@@ -73,15 +82,23 @@ const profileName = options.wheel ? `${options.version} Yoep de LEDLights ${opti
 const preProcessedProfile =
     createMutator(profileSpecificPreProcess)
         // Macro Re-structure
+        .mutate([], container => ({
+            ...container,
+            GlobalBrightness: brightness || container.GlobalBrightness,
+            GlobalBrightnessPreset: {
+                Brightness: brightness || container.GlobalBrightness,
+                BrightnessSettings: {
+                    Day: brightness || container.GlobalBrightness,
+                    Night: brightness || container.GlobalBrightness
+                }
+            },
+            Name: profileName,
+            ProfileId: crypto.randomUUID()
+        }))
         .move(deprecatedPaths.middleFocusedPath, deprecatedPaths.rpmPath)
         .mutate(deprecatedPaths.movedMiddleFocusedPath, container => ({
             ...container,
             Description: 'Cars'
-        }))
-        .mutate([], container => ({
-            ...container,
-            Name: profileName,
-            ProfileId: crypto.randomUUID()
         }))
         // Micro Re-structure
         .move(deprecatedPaths.leftModuleMercedesW12DrsPath, paths.mercedesW12ContainerPath)
@@ -138,22 +155,24 @@ if (options.preprocess) {
             }))
             .mutate(paths.carsNotRunningPath, container => ({
                 ...container,
-                StartPosition: leftStartPosition,
+                StartPosition: 1,
                 LedContainers: container.LedContainers.map(ledContainer => ({
                     ...ledContainer,
-                    LedCount: total
+                    LedCount: leds,
+                    StartPosition: 1
                 }))
             }))
             .mutate(paths.gameNotRunningPath, container => ({
                 ...container,
-                StartPosition: leftStartPosition,
+                StartPosition: 1,
                 LedContainers: container.LedContainers.map(ledContainer => ({
                     ...ledContainer,
-                    LedCount: total
+                    LedCount: leds,
+                    StartPosition: 1
                 }))
             }))
-            .mutate(paths.leftModulePath, (module) => left > 0 ? downsizeModule(left, settings.reverseLeftModule)(module) : module)
-            .mutate(paths.rightModulePath, (module) => right > 0 ? downsizeModule(right, settings.reverseRightModule)(module) : module)
+            .mutate(paths.leftModulePath, (module) => left > 0 ? downsizeModule(left, reverseLeftModule)(module) : module)
+            .mutate(paths.rightModulePath, (module) => right > 0 ? downsizeModule(right, reverseRightModule)(module) : module)
             .mutate(paths.mx5Path, downsizeCar(middle))
             .mutate(paths.gr86Path, downsizeCar(middle))
             .mutate(paths.m2Path, downsizeCar(middle))

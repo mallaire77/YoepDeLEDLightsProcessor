@@ -18,12 +18,22 @@ export const downsizeModule = (numLeds, reverse = false, debug = false) => (cont
       case "Flags.YellowFlag":
       case "Flags.RedFlag":
       case "Flags.BlueFlag":
+      case "Status.SpotterCarLeft":
+      case "Status.SpotterCarRight":
       case "Status.SpeedLimiter":
       case "Status.SpeedLimiterAnimation":
       case "Groups.GameCarSpeedLimiterGroup": {
         // Default values if not defined
         const originalStart = result.StartPosition || 1
         const originalCount = result.LedCount || 1
+
+        if (!result.StartPosition) {
+          result.StartPosition = originalStart
+        }
+
+        if (!result.LedCount) {
+          result.LedCount = originalCount
+        }
 
         if (reverse) {
           // When reversing, we flip the start position
