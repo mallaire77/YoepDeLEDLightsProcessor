@@ -238,10 +238,9 @@ export const downsizeAnimationContainer = (animationContainer, targetNumLeds, st
     }
   }
 
-  const downsize = (frame, numLeds, targetNumLeds) => {
-    const adjustedNumLeds = numLeds % 2 === targetNumLeds % 2 ? numLeds : numLeds - 1
-    const slice = Math.round((adjustedNumLeds - targetNumLeds) / 2)
-    
+  const downsize = (frame, targetNumLeds) => {
+    const numLeds = frame.Colors.length
+
     // Check if we have LEDs at start and end positions
     const hasStartLed = frame.Colors.length > 0 && frame.Colors[0].color !== '#000000'
     const hasEndLed = frame.Colors.length > 0 && frame.Colors[frame.Colors.length - 1].color !== '#000000'
@@ -249,44 +248,36 @@ export const downsizeAnimationContainer = (animationContainer, targetNumLeds, st
     let min, max
     if (hasStartLed && !hasEndLed) {
       min = 0
-      max = adjustedNumLeds - 1 - (slice * 2)
+      max = targetNumLeds - 1
     } else if (!hasStartLed && hasEndLed) {
-      min = slice * 2 
-      max = adjustedNumLeds - 1
+      min = numLeds - targetNumLeds
+      max = numLeds - 1
     } else {
-      min = slice
-      max = adjustedNumLeds - 1 - slice
+      const startOffset = Math.floor((numLeds - targetNumLeds) / 2)
+      min = startOffset
+      max = startOffset + targetNumLeds - 1
     }
 
-    // console.log({
-    //   hasStartLed,
-    //   hasEndLed,
-    //   min,
-    //   max,
-    //   numLeds,
-    //   adjustedNumLeds,
-    //   targetNumLeds,
-    //   slice,
-    //   colors: frame.Colors
-    // })
+    const updatedColors = frame.Colors
+      .filter(color => {
+          return color.position >= min && color.position <= max
+      })
+      .map(color => {
+          return {
+              ...color,
+              position: color.position - min,
+          }
+      })
+      .sort((a, b) => {
+          return a.position - b.position
+      })
 
-    return {
-        ...frame,
-        Colors:
-            frame.Colors
-                .filter(color => {
-                    return color.position >= min && color.position <= max
-                })
-                .map(color => {
-                    return {
-                        ...color,
-                        position: color.position - slice,
-                    }
-                })
-                .sort((a, b) => {
-                    return a.position - b.position
-                })
+    const updatedFrame = {  
+      ...frame,
+      Colors: updatedColors
     }
+
+    return updatedFrame
   }
 
   const numLeds = parseInt(animationContainer.Animation.Columns, 10)
@@ -303,28 +294,33 @@ export const downsizeAnimationContainer = (animationContainer, targetNumLeds, st
           .slice(0, Math.floor(frame.Colors.length / 2))
           .every((color, colorIdx) => color.color.toLowerCase() === frame.Colors[frame.Colors.length - 1 - colorIdx].color.toLowerCase())
 
-        console.log({
-          isSymmetric,
-          numLeds,
-          targetNumLeds,
-          colors: frame.Colors
-        })
-
         if (targetNumLeds === 0) {
-          return []
+          return serialize({
+            ...frame,
+            Colors: []
+          })
+        } else if (numLeds <= targetNumLeds) {
+          return serialize({
+            ...frame,
+            StartPosition: startPosition + Math.round((targetNumLeds - numLeds) / 2),
+          })
         } else if (isSymmetric && numLeds % 2 === 0) {
           const half = frame.Colors.slice(0, numLeds / 2)
 
           const downsizedFrame = downsize({
             ...frame,
             Colors: half
-          }, numLeds / 2, targetNumLeds / 2)
+          }, targetNumLeds / 2)
 
           const downsizedColors =
             [...downsizedFrame.Colors, ...downsizedFrame.Colors.reverse()].map((color, idx) => ({
               ...color,
               position: idx
             }))
+
+          if (downsizedColors.length !== targetNumLeds) {
+            console.warn('downsizedColors.length !== targetNumLeds', downsizedFrame.Colors.length, targetNumLeds)
+          }
 
           return serialize({
             ...downsizedFrame,
@@ -337,7 +333,7 @@ export const downsizeAnimationContainer = (animationContainer, targetNumLeds, st
           const downsizedFrame = downsize({
             ...frame,
             Colors: half
-          }, Math.round(numLeds / 2), Math.floor(targetNumLeds / 2))
+          }, Math.floor(targetNumLeds / 2))
 
           const downsizedColors =
             [...downsizedFrame.Colors, frame.Colors[midpoint + 1], ...downsizedFrame.Colors.reverse()].map((color, idx) => ({
@@ -345,12 +341,21 @@ export const downsizeAnimationContainer = (animationContainer, targetNumLeds, st
               position: idx
             }))
 
+          if (downsizedColors.length !== targetNumLeds) {
+            console.warn('downsizedColors.length !== targetNumLeds', downsizedFrame.Colors.length, targetNumLeds)
+          }
+
           return serialize({
             ...downsizedFrame,
             Colors: downsizedColors
           })
         } else {
-          return serialize(downsize(frame, numLeds, targetNumLeds))
+          const downsizedFrame = downsize(frame, targetNumLeds)
+          if (downsizedFrame.Colors.length !== targetNumLeds) {
+            console.warn('downsizedColors.length !== targetNumLeds', downsizedFrame.Colors.length, targetNumLeds)
+          }
+
+          return serialize(downsizedFrame)
         }
       })
     }

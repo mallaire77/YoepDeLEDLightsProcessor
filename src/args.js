@@ -4,7 +4,6 @@ export default () => {
         version: '20250102',
         wheel: undefined,
         preprocess: undefined,
-        debug: undefined,
         settings: {
             left: 3,
             middle: 16,
@@ -54,6 +53,14 @@ export default () => {
                     i++
                     break
 
+                case '--reverse-left-module':
+                    options.settings.reverseLeftModule = true
+                    break
+
+                case '--reverse-right-module':
+                    options.settings.reverseRightModule = true
+                    break
+
                 case '--wheel':
                     options.wheel = args[i + 1]
                     i++
@@ -61,10 +68,6 @@ export default () => {
 
                 case '--pre-process':
                     options.preprocess = true
-                    break
-
-                case '--debug':
-                    options.debug = true
                     break
 
                 default:

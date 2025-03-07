@@ -3,6 +3,11 @@ export default {
         left: 0,
         middle: 9,
         right: 0,
+        customLeftStart: undefined,
+        customMiddleStart: undefined,
+        customRightStart: undefined,
+        reverseLeftModule: undefined,
+        reverseRightModule: undefined,
     },
     leoxz_xgt_pro_buttons: {
         left: 3,

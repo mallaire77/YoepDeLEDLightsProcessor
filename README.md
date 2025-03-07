@@ -23,9 +23,10 @@ node --experimental-vm-modules node_modules/jest/bin/jest.js
 | --custom-left-start | Custom starting position for the left module | N/A | N/A |
 | --custom-middle-start | Custom starting position for the middle module, this will ignore the logic to add the left module end position. | N/A | N/A |
 | --custom-right-start | Custom starting position for the middle module, this will ignore the logic to add the middle module end position. | N/A | N/A |
+| --reverse-left-module | If specified, reverses the order of LED segments in the left module | N/A | N/A |
+| --reverse-right-module | If specified, reverses the order of LED segments in the right module | N/A | N/A |
 | --wheel | If specified use the specified wheel's configuration, this will ignore all other parameters. Valid list of wheels below. | N/A | N/A |
 | --pre-process | Pre-process only | N/A | N/A |
-| --debug | Whether to output debug logs | N/A | N/A |
 
 ## Wheels
 | Wheel | Description | Key |
