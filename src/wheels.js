@@ -1,6 +1,6 @@
 export default {
     leoxz_xgt_pro_rpm: {
-        brightness: 3,
+        brightness: 25,
         left: 0,
         middle: 9,
         right: 0,
@@ -12,7 +12,7 @@ export default {
         reverseRightModule: undefined,
     },
     leoxz_xgt_pro_buttons: {
-        brightness: 3,
+        brightness: 50,
         left: 3,
         middle: 0,
         right: 3,
