@@ -41,7 +41,6 @@ This command will:
 - Configure the middle/RPM module with 9 segments starting after the left module
 - Configure the right module with 3 segments starting after the middle module
 <br>
-<br>
 
 ```
 node src/main.js --wheel leoxz_xgt_pro_rpm
