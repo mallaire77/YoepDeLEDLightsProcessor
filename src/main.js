@@ -3,8 +3,7 @@ import crypto from 'crypto'
 import args from './args.js'
 import wheels from './wheels.js'
 import { downsizeCar } from './cars/common.js'
-import { downsizeModule } from './modules/common.js'
-import { createMutator, createReader } from './common.js'
+import { createMutator, createReader, downsizeModule } from './common.js'
 import { deprecatedPaths, paths } from './paths.js'
 
 // GT3
@@ -59,7 +58,6 @@ if (isEven) {
         process.exit(1)
     }
 
-    // Pre-process original profile (modify structure)
     profileSpecificPreProcess =
         createMutator(profile)
             .move(deprecatedPaths.hpdArx01PathEven, deprecatedPaths.middleFocusedPrototypePath)
@@ -176,14 +174,34 @@ if (options.preprocess) {
             .mutate(paths.mx5Path, downsizeCar(middle))
             .mutate(paths.gr86Path, downsizeCar(middle))
             .mutate(paths.m2Path, downsizeCar(middle))
+            .mutate(paths.radicalSR8Path, downsizeCar(middle))
+            .mutate(paths.radicalSR10Path, downsizeCar(middle))
+            .mutate(paths.scaaSpecPath, downsizeCar(middle))
             .mutate(paths.p499Path, downsizeCar(middle))
             .mutate(paths.p217Path, downsizeCar(middle))
             .mutate(paths.vSeriesRPath, downsizeCar(middle))
+            .mutate(paths.arx06Path, downsizeCar(middle))
+            .mutate(paths.mHybridV8Path, downsizeCar(middle))
+            .mutate(paths.porsche963Path, downsizeCar(middle))
+            .mutate(paths.jsP320Path, downsizeCar(middle))
             .mutate(paths.gt3M4Path, downsizeCar(middle))
             .mutate(paths.gt3296Path, gt3296(middle))
             .mutate(paths.gt3720sPath, downsizeCar(middle))
             .mutate(paths.gt3911RPath, downsizeCar(middle))
             .mutate(paths.gt3Amg2020Path, downsizeCar(middle))
+            .mutate(paths.gt3488Path, downsizeCar(middle))
+            .mutate(paths.gt3NSXPath, downsizeCar(middle))
+            .mutate(paths.gt3AudiPath, downsizeCar(middle))
+            .mutate(paths.gt3LamborghiniPath, downsizeCar(middle))
+            .mutate(paths.gt3911CupPath, downsizeCar(middle))
+            .mutate(paths.gt3MustangPath, downsizeCar(middle))
+            .mutate(paths.gt3CorvettePath, downsizeCar(middle))
+            .mutate(paths.gt4718CaymanPath, downsizeCar(middle))
+            .mutate(paths.gt4AmgPath, downsizeCar(middle))
+            .mutate(paths.gt4570sPath, downsizeCar(middle))
+            .mutate(paths.gt4M4G82Path, downsizeCar(middle))
+            .mutate(paths.gt4M4Path, downsizeCar(middle))
+            .mutate(paths.gt4VantagePath, downsizeCar(middle))
             .mutate(paths.formulaVeePath, downsizeCar(middle))
             .mutate(paths.formulaFordPath, downsizeCar(middle))
             .mutate(paths.formula2000Path, downsizeCar(middle))

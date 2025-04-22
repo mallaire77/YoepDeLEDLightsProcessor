@@ -1,5 +1,5 @@
 # Yoep-de-LEDLights Processor
-Tool to downsize Yoep de Light profiles.
+Tool to downsize default (*16 & 15 leds*) Yoep de Light profiles.
 
 ## Usage
 
@@ -7,11 +7,6 @@ Tool to downsize Yoep de Light profiles.
 ```
 node src/main.js
 ```
-
-**Test**
-```
-node --experimental-vm-modules node_modules/jest/bin/jest.js
-``` 
 
 ## Optional Parameters
 | Parameter | Description | Valid Range | Default |
@@ -46,3 +41,72 @@ This command will:
 - Configure the left module with 3 segments starting at position 1
 - Configure the middle/RPM module with 9 segments starting after the left module
 - Configure the right module with 3 segments starting after the middle module
+<br>
+<br>
+```
+node src/main.js --wheel leoxz_xgt_pro_rpm
+node src/main.js --wheel leoxz_xgt_pro_buttons
+```
+
+This command will:
+- Create the profile perfectly for the Leoxz XGT Pro Wheel RPM lights
+- Create the profile perfectly for the Leoxz XGT Pro Wheel Button lights
+
+## Supported Cars
+
+### Various
+- Mazda MX-5 Cup
+- Toyota GR86
+- BMW M2 CS Racing
+- Radical SR8
+- Radical SR10
+- SCCA Spec Racer Ford
+
+### GT4
+- Porsche 718 Cayman GT4
+- Mercedes AMG GT4
+- McLaren 570S GT4
+- BMW M4 G82 GT4
+- BMW M4 GT4
+- Aston Martin Vantage GT4
+
+### GT3
+- Ferrari 296 GT3
+- Ferrari 488 GT3 Evo
+- Mercedes-AMG GT3 2020
+- Porsche 911 GT3 R (992)
+- Porsche 911 GT3 Cup (992)
+- McLaren 720S GT3 EVO
+- BMW M4 GT3
+- Acura NSX GT3 EVO 22
+- Audi R8 LMS EVO II GT3
+- Lamborghini Huracan GT3 EVO
+- Ford Mustang GT3
+- Chevrolet Corvette Z06 GT3.R
+
+### Prototype
+- Ferrari 499P
+- Dallara P217 LMP2
+- Cadillac V-Series.R
+- Acura ARX-06
+- BMW M Hybrid V8
+- Porsche 963 GTP
+- Ligier JS P320
+
+### Open-Wheel Various
+- Formula Vee
+- Ray Formula 1600
+- Skip Barber Formula 2000
+
+### Open-Wheel Feeder
+- FIA F4
+- Dallara F312 F3
+
+### Open-Wheel Super Formula 
+- Super Formula Lights 324
+- Super Formula SF23 - Honda
+- Super Formula SF23 - Toyota
+
+### Open-Wheel Formuala 1
+- Mercedes W12
+- Mercedes-AMG W13 E Performance

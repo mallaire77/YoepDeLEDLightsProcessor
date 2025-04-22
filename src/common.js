@@ -787,3 +787,53 @@ export const downsizeAnimationContainer = (animationContainer, targetNumLeds, st
     }
   }
 }
+
+export const downsizeModule = (numLeds, reverse = false, debug = false) => (container) => {
+  const processContainers = (container) => {
+    const result = { ...container }
+
+    if (result.LedContainers) {
+      result.LedContainers = result.LedContainers.map(processContainers)
+    }
+
+    switch (result.ContainerType) {
+      case "Animation":
+        return downsizeAnimationContainer(result, numLeds, 1, reverse, debug)
+
+      case "CustomStatus":
+      case "StaticColor":
+      case "Flags.GreenFlag":
+      case "Flags.YellowFlag":
+      case "Flags.RedFlag":
+      case "Flags.BlueFlag":
+      case "Status.SpotterCarLeft":
+      case "Status.SpotterCarRight":
+      case "Status.SpeedLimiter":
+      case "Status.SpeedLimiterAnimation":
+      case "Groups.GameCarSpeedLimiterGroup": {
+        const originalStart = result.StartPosition || 1
+        const originalCount = result.LedCount || 1
+
+        if (!result.StartPosition) {
+          result.StartPosition = originalStart
+        }
+
+        if (!result.LedCount) {
+          result.LedCount = originalCount
+        }
+
+        if (reverse) {
+          result.StartPosition = numLeds - originalStart - originalCount + 2
+        }
+
+        result.StartPosition = Math.max(1, Math.min(numLeds, result.StartPosition))
+        result.LedCount = Math.min(originalCount, numLeds - result.StartPosition + 1)
+        return result
+      }
+      default:
+        return result
+    }
+  }
+
+  return processContainers(container)
+}

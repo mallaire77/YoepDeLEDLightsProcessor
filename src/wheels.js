@@ -12,7 +12,7 @@ export default {
         reverseRightModule: undefined,
     },
     leoxz_xgt_pro_buttons: {
-        brightness: 50,
+        brightness: 5,
         left: 3,
         middle: 0,
         right: 3,

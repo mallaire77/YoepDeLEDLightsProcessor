@@ -2,8 +2,5 @@
     "name": "yoep-de-ledlights",
     "version": "1.0.0",
     "type": "module",
-    "private": true,
-    "devDependencies": {
-        "jest": "^29.7.0"
-    }
+    "private": true
 }

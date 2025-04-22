@@ -15,12 +15,19 @@ const variousPath = [...carsPath, 'LedContainers', { field: 'Description', value
 const mx5Path = [...variousPath, 'LedContainers', { field: 'CarModel', value: 'Mazda MX-5 Cup' }]
 const gr86Path = [...variousPath, 'LedContainers', { field: 'CarModel', value: 'Toyota GR86' }]
 const m2Path = [...variousPath, 'LedContainers', { field: 'CarModel', value: 'BMW M2 CS Racing' }]
+const radicalSR8Path = [...variousPath, 'LedContainers', { field: 'CarModel', value: 'Radical SR8' }]
+const radicalSR10Path = [...variousPath, 'LedContainers', { field: 'CarModel', value: 'Radical SR10' }]
+const scaaSpecPath = [...variousPath, 'LedContainers', { field: 'CarModel', value: 'SCCA Spec Racer Ford' }]
 
 // Prototype
 const prototypePath = [...carsPath, 'LedContainers', { field: 'Description', value: 'Prototype' }]
-const p499Path = [...prototypePath, 'LedContainers', { field: 'CarModel', value: 'Ferrari 499P' }]
-const p217Path = [...prototypePath, 'LedContainers', { field: 'CarModel', value: 'Dallara P217 LMP2' }]
-const vSeriesRPath = [...prototypePath, 'LedContainers', { field: 'CarModel', value: 'Cadillac V-Series.R' }]
+const protoypeP499Path = [...prototypePath, 'LedContainers', { field: 'CarModel', value: 'Ferrari 499P' }]
+const prototypeP217Path = [...prototypePath, 'LedContainers', { field: 'CarModel', value: 'Dallara P217 LMP2' }]
+const prototypeVSeriesRPath = [...prototypePath, 'LedContainers', { field: 'CarModel', value: 'Cadillac V-Series.R' }]
+const prototypeArx06Path = [...prototypePath, 'LedContainers', { field: 'CarModel', value: 'Acura ARX-06' }]
+const prototypeMHybridV8Path = [...prototypePath, 'LedContainers', { field: 'CarModel', value: 'BMW M Hybrid V8' }]
+const prototype963Path = [...prototypePath, 'LedContainers', { field: 'CarModel', value: 'Porsche 963 GTP' }]
+const prototypeJsP320Path = [...prototypePath, 'LedContainers', { field: 'CarModel', value: 'Ligier JS P320' }]
 
 // GT3
 const gt3Path = [...carsPath, 'LedContainers', { field: 'Description', value: 'GT3' }]
@@ -29,6 +36,22 @@ const gt3Amg2020Path = [...gt3Path, 'LedContainers', { field: 'CarModel', value:
 const gt3911RPath = [...gt3Path, 'LedContainers', { field: 'CarModel', value: 'Porsche 911 GT3 R (992)' }]
 const gt3720sPath = [...gt3Path, 'LedContainers', { field: 'CarModel', value: 'McLaren 720S GT3 EVO' }]
 const gt3M4Path = [...gt3Path, 'LedContainers', { field: 'CarModel', value: 'BMW M4 GT3' }]
+const gt3488Path = [...gt3Path, 'LedContainers', { field: 'CarModel', value: 'Ferrari 488 GT3 Evo' }]
+const gt3NSXPath = [...gt3Path, 'LedContainers', { field: 'CarModel', value: 'Acura NSX GT3 EVO 22' }]
+const gt3AudiPath = [...gt3Path, 'LedContainers', { field: 'CarModel', value: 'Audi R8 LMS EVO II GT3' }]
+const gt3LamborghiniPath = [...gt3Path, 'LedContainers', { field: 'CarModel', value: 'Lamborghini Huracan GT3 EVO' }]
+const gt3911CupPath = [...gt3Path, 'LedContainers', { field: 'CarModel', value: 'Porsche 911 GT3 Cup (992)' }]
+const gt3MustangPath = [...gt3Path, 'LedContainers', { field: 'CarModel', value: 'Ford Mustang GT3' }]
+const gt3CorvettePath = [...gt3Path, 'LedContainers', { field: 'CarModel', value: 'Chevrolet Corvette Z06 GT3.R' }]
+
+// GT4
+const gt4Path = [...carsPath, 'LedContainers', { field: 'Description', value: 'GT4' }]
+const gt4718CaymanPath = [...gt4Path, 'LedContainers', { field: 'CarModel', value: 'Porsche 718 Cayman GT4' }]
+const gt4AmgPath = [...gt4Path, 'LedContainers', { field: 'CarModel', value: 'Mercedes AMG GT4' }]
+const gt4570sPath = [...gt4Path, 'LedContainers', { field: 'CarModel', value: 'McLaren 570S GT4' }]
+const gt4M4G82Path = [...gt4Path, 'LedContainers', { field: 'CarModel', value: 'BMW M4 G82 GT4' }]
+const gt4M4Path = [...gt4Path, 'LedContainers', { field: 'CarModel', value: 'BMW M4 GT4' }]
+const gt4VantagePath = [...gt4Path, 'LedContainers', { field: 'CarModel', value: 'Aston Martin Vantage GT4' }]
 
 // Open Wheel - Various
 const openWheelPath = [...carsPath, 'LedContainers', { field: 'Description', value: 'Open Wheel' }]
@@ -70,12 +93,19 @@ export const paths = {
     mx5Path,
     gr86Path,
     m2Path,
+    radicalSR8Path,
+    radicalSR10Path,
+    scaaSpecPath,
 
     // Prototype
     prototypePath,
-    p499Path,
-    p217Path,
-    vSeriesRPath,
+    prototypeP499Path,
+    prototypeP217Path,
+    prototypeVSeriesRPath,
+    prototypeArx06Path,
+    prototypeMHybridV8Path,
+    prototype963Path,
+    prototypeJsP320Path,
 
     // GT3
     gt3Path,
@@ -84,6 +114,22 @@ export const paths = {
     gt3911RPath,
     gt3720sPath,
     gt3M4Path,
+    gt3488Path,
+    gt3NSXPath,
+    gt3AudiPath,
+    gt3LamborghiniPath,
+    gt3911CupPath,
+    gt3MustangPath,
+    gt3CorvettePath,
+
+    // GT4
+    gt4Path,
+    gt4718CaymanPath,
+    gt4AmgPath,
+    gt4570sPath,
+    gt4M4G82Path,
+    gt4M4Path,
+    gt4VantagePath,
 
     // Open Wheel
     openWheelPath,
