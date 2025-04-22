@@ -109,6 +109,77 @@ const preProcessedProfile =
             ...car,
             StartPosition: 1
         }))
+        // Add new modules
+        .mutate([...paths.leftModulePath, 'LedContainers', { field: 'Description', value: 'Effects' }], container => {
+          return {
+            ...container,
+            LedContainers: [
+              ...container.LedContainers,
+              {
+                "LedContainers": [
+                  {
+                    "TriggerFormula": {
+                      "JSExt": 0,
+                      "Interpreter": 1,
+                      "Expression": "return (\r\n\t$prop('CarModel') == \"Mazda MX-5 Cup\" ||\r\n\t$prop('CarModel') == \"Toyota GR86\" ||\r\n\t$prop('CarModel') == \"BMW M2 CS Racing\" ||\r\n\t$prop('CarModel') == \"Radical SR8\" ||\r\n\t$prop('CarModel') == \"Radical SR10\" ||\r\n\t$prop('CarModel') == \"SCCA Spec Racer Ford\" ||\r\n\t$prop('CarModel') == \"Porsche 718 Cayman GT4\" ||\r\n\t$prop('CarModel') == \"Porsche 911 GT3 R (992)\" ||\r\n\t$prop('CarModel') == \"Porsche 911 GT3 Cup (992)\" ||\r\n\t$prop('CarModel') == \"Audi R8 LMS EVO II GT3\" ||\r\n\t$prop('CarModel') == \"BMW M Hybrid V8\" ||\r\n\t$prop('CarModel') == \"Formula Vee\" ||\r\n\t$prop('CarModel') == \"Ray Formula 1600\" ||\r\n\t$prop('CarModel') == \"Skip Barber Formula 2000\" ||\r\n\t$prop('CarModel') == \"FIA F4\"\r\n)"
+                    },
+                    "LedContainers": [
+                      {
+                        "IdleBlinkingColor": "Transparent",
+                        "EnableIdleBlinking": false,
+                        "LedCount": 3,
+                        "Color": "White",
+                        "BlinkingColor": "Transparent",
+                        "BlinkEnabled": true,
+                        "BlinkDelay": 400,
+                        "ContainerType": "StaticColor"
+                      }
+                    ],
+                    "ContainerType": "Groups.CustomConditionalGroup",
+                    "Description": "car w/o pit limiter effects"
+                  }
+                ],
+                "ContainerType": "Groups.GameCarSpeedLimiterGroup",
+                "Description": "pit limiter"
+              }
+            ]
+          }
+        })
+        .mutate([...paths.rightModulePath, 'LedContainers', { field: 'Description', value: 'Effects' }], container => {
+          return {
+            ...container,
+            LedContainers: [
+              ...container.LedContainers,
+              {
+                "LedContainers": [
+                  {
+                    "TriggerFormula": {
+                      "JSExt": 0,
+                      "Interpreter": 1,
+                      "Expression": "return (\r\n\t$prop('CarModel') == \"Mazda MX-5 Cup\" ||\r\n\t$prop('CarModel') == \"Toyota GR86\" ||\r\n\t$prop('CarModel') == \"BMW M2 CS Racing\" ||\r\n\t$prop('CarModel') == \"Radical SR8\" ||\r\n\t$prop('CarModel') == \"Radical SR10\" ||\r\n\t$prop('CarModel') == \"SCCA Spec Racer Ford\" ||\r\n\t$prop('CarModel') == \"Porsche 718 Cayman GT4\" ||\r\n\t$prop('CarModel') == \"Porsche 911 GT3 R (992)\" ||\r\n\t$prop('CarModel') == \"Porsche 911 GT3 Cup (992)\" ||\r\n\t$prop('CarModel') == \"Audi R8 LMS EVO II GT3\" ||\r\n\t$prop('CarModel') == \"BMW M Hybrid V8\" ||\r\n\t$prop('CarModel') == \"Formula Vee\" ||\r\n\t$prop('CarModel') == \"Ray Formula 1600\" ||\r\n\t$prop('CarModel') == \"Skip Barber Formula 2000\" ||\r\n\t$prop('CarModel') == \"FIA F4\"\r\n)"
+                    },
+                    "LedContainers": [
+                      {
+                        "IdleBlinkingColor": "Transparent",
+                        "EnableIdleBlinking": false,
+                        "LedCount": 3,
+                        "Color": "White",
+                        "BlinkingColor": "Transparent",
+                        "BlinkEnabled": true,
+                        "BlinkDelay": 400,
+                        "ContainerType": "StaticColor"
+                      }
+                    ],
+                    "ContainerType": "Groups.CustomConditionalGroup",
+                    "Description": "car w/o pit limiter effects"
+                  }
+                ],
+                "ContainerType": "Groups.GameCarSpeedLimiterGroup",
+                "Description": "pit limiter"
+              }
+            ]
+          }
+        })
         // Cleanup
         .delete(deprecatedPaths.leftModuleFormula1Path)
         .delete(deprecatedPaths.wipPath)
@@ -177,23 +248,23 @@ if (options.preprocess) {
             .mutate(paths.radicalSR8Path, downsizeCar(middle))
             .mutate(paths.radicalSR10Path, downsizeCar(middle))
             .mutate(paths.scaaSpecPath, downsizeCar(middle))
-            .mutate(paths.p499Path, downsizeCar(middle))
-            .mutate(paths.p217Path, downsizeCar(middle))
-            .mutate(paths.vSeriesRPath, downsizeCar(middle))
-            .mutate(paths.arx06Path, downsizeCar(middle))
-            .mutate(paths.mHybridV8Path, downsizeCar(middle))
-            .mutate(paths.porsche963Path, downsizeCar(middle))
-            .mutate(paths.jsP320Path, downsizeCar(middle))
+            .mutate(paths.protoypeP499Path, downsizeCar(middle))
+            .mutate(paths.prototypeP217Path, downsizeCar(middle))
+            .mutate(paths.prototypeVSeriesRPath, downsizeCar(middle))
+            .mutate(paths.prototypeArx06Path, downsizeCar(middle))
+            .mutate(paths.prototypeMHybridV8Path, downsizeCar(middle))
+            .mutate(paths.prototype963Path, downsizeCar(middle))
+            .mutate(paths.prototypeJsP320Path, downsizeCar(middle))
             .mutate(paths.gt3M4Path, downsizeCar(middle))
             .mutate(paths.gt3296Path, gt3296(middle))
             .mutate(paths.gt3720sPath, downsizeCar(middle))
             .mutate(paths.gt3911RPath, downsizeCar(middle))
             .mutate(paths.gt3Amg2020Path, downsizeCar(middle))
-            .mutate(paths.gt3488Path, downsizeCar(middle))
             .mutate(paths.gt3NSXPath, downsizeCar(middle))
             .mutate(paths.gt3AudiPath, downsizeCar(middle))
             .mutate(paths.gt3LamborghiniPath, downsizeCar(middle))
-            .mutate(paths.gt3911CupPath, downsizeCar(middle))
+            .mutate(paths.gt3992CupPath, downsizeCar(middle))
+            .mutate(paths.gt3991CupPath, downsizeCar(middle))
             .mutate(paths.gt3MustangPath, downsizeCar(middle))
             .mutate(paths.gt3CorvettePath, downsizeCar(middle))
             .mutate(paths.gt4718CaymanPath, downsizeCar(middle))
