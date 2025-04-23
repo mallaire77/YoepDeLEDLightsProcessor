@@ -1,0 +1,27 @@
+{
+  "LedContainers": [
+    {
+      "TriggerFormula": {
+        "JSExt": 0,
+        "Interpreter": 1,
+        "Expression": "return (\r\n\t$prop('CarModel') == \"Mazda MX-5 Cup\" ||\r\n\t$prop('CarModel') == \"Toyota GR86\" ||\r\n\t$prop('CarModel') == \"BMW M2 CS Racing\" ||\r\n\t$prop('CarModel') == \"Radical SR8\" ||\r\n\t$prop('CarModel') == \"Radical SR10\" ||\r\n\t$prop('CarModel') == \"SCCA Spec Racer Ford\" ||\r\n\t$prop('CarModel') == \"Porsche 718 Cayman GT4\" ||\r\n\t$prop('CarModel') == \"Porsche 911 GT3 R (992)\" ||\r\n\t$prop('CarModel') == \"Porsche 911 GT3 Cup (992)\" ||\r\n\t$prop('CarModel') == \"Audi R8 LMS EVO II GT3\" ||\r\n\t$prop('CarModel') == \"BMW M Hybrid V8\" ||\r\n\t$prop('CarModel') == \"Formula Vee\" ||\r\n\t$prop('CarModel') == \"Ray Formula 1600\" ||\r\n\t$prop('CarModel') == \"Skip Barber Formula 2000\" ||\r\n\t$prop('CarModel') == \"FIA F4\"\r\n)"
+      },
+      "LedContainers": [
+        {
+          "IdleBlinkingColor": "Transparent",
+          "EnableIdleBlinking": false,
+          "LedCount": 3,
+          "Color": "White",
+          "BlinkingColor": "Transparent",
+          "BlinkEnabled": true,
+          "BlinkDelay": 400,
+          "ContainerType": "StaticColor"
+        }
+      ],
+      "ContainerType": "Groups.CustomConditionalGroup",
+      "Description": "car w/o pit limiter effects"
+    }
+  ],
+  "ContainerType": "Groups.GameCarSpeedLimiterGroup",
+  "Description": "pit limiter"
+}
